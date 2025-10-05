@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,22 +8,73 @@
 :root{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
 .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}/* Topbar */ .topbar{position:sticky;top:0;z-index:20;background:#ffffffcc;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)} .dark .topbar{background:#0c1426cc} .topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none} .topbar .inner::-webkit-scrollbar{display:none} .brand{font-weight:800;flex-shrink:0} .btn-sm{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;flex-shrink:0;white-space:nowrap;height:36px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
 
-/* Containers */ .wrap{max-width:860px;margin:24px auto;padding:16px} .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 26px rgba(15, 23, 42, .06)} h1{margin:0 0 8px;font-size:22px} p.small{color:var(--muted);margin:0 0 12px}
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:20;background:#ffffffcc;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.dark .topbar{background:#0c1426cc}
+.topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.topbar .inner::-webkit-scrollbar{display:none}
+.brand{font-weight:800;flex-shrink:0}
+.btn-sm{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;flex-shrink:0;white-space:nowrap;height:36px}
 
-/* Date row */ .date-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px} .date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px} .date-input input{width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700} .dark .date-input input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40} .pill{align-self:end;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:110px;text-align:center} .dark .pill{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
+/* Containers */
+.wrap{max-width:860px;margin:24px auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 26px rgba(15, 23, 42, .06)}
+h1{margin:0 0 8px;font-size:22px}
+p.small{color:var(--muted);margin:0 0 12px}
 
-/* Time grid */ .time-grid{display:grid;grid-template-columns:1fr 1fr 130px;gap:12px} @media (max-width:560px){.time-grid{grid-template-columns:1fr 1fr}.break-col{grid-column:span 2;justify-self:end;max-width:200px;width:100%}} .time-box{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px} .dark .time-box{background:#0e1528;border-color:#1f2b40} .time-box .title{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px} .start .title{color:var(--ok)} .end .title{color:var(--warn)} .time-box input{width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700} .dark .time-box input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40} .start input{border-color:#86efac;background:#ecfdf5} .end input{border-color:#fecaca;background:#fef2f2} .dark .start input{border-color:#14532d;background:rgba(22,163,74,.08)} .dark .end input{border-color:#7f1d1d;background:rgba(239,68,68,.08)}
+/* Date row */
+.date-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:8px}
+.date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px}
+.date-input input{width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700}
+.dark .date-input input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
+.pill{align-self:end;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:#0f172a;font-size:13px;font-weight:700;min-width:110px;text-align:center}
+.dark .pill{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
 
-/* KPI */ .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px} .kcard{border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;text-align:center} .dark .kcard{background:#0a1222;border-color:#1f2b40;color:#e5e7eb} .kcard h3{margin:0;color:var(--muted);font-size:13px} .kcard .val{font-size:20px;font-weight:800;margin-top:4px}
+/* Time grid */
+.time-grid{display:grid;grid-template-columns:1fr 1fr 130px;gap:12px}
+@media (max-width:560px){.time-grid{grid-template-columns:1fr 1fr}.break-col{grid-column:span 2;justify-self:end;max-width:200px;width:100%}}
+.time-box{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px}
+.dark .time-box{background:#0e1528;border-color:#1f2b40}
+.time-box .title{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px}
+.start .title{color:var(--ok)} .end .title{color:var(--warn)}
+.time-box input{width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#0f172a;direction:ltr;text-align:center;font-weight:700}
+.dark .time-box input{background:#0a1222;color:#e5e7eb;border-color:#1f2b40}
+.start input{border-color:#86efac;background:#ecfdf5}
+.end input{border-color:#fecaca;background:#fef2f2}
+.dark .start input{border-color:#14532d;background:rgba(22,163,74,.08)}
+.dark .end input{border-color:#7f1d1d;background:rgba(239,68,68,.08)}
 
-/* Modals */ .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px} .modal.open{display:flex} .dialog{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:860px;width:100%;padding:16px;max-height:85vh;overflow:auto} .dialog h2{margin:0 0 10px;font-size:18px} .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px} .table{width:100%;border-collapse:separate;border-spacing:0 8px} thead th{font-size:12px;color:#334155} th,td{padding:8px 10px;text-align:center} tbody tr{background:#fff;border:1px solid var(--line)} .dark tbody tr{background:#0a1222;border-color:#1f2b40} tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px} tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.kcard{border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;text-align:center}
+.dark .kcard{background:#0a1222;border-color:#1f2b40;color:#e5e7eb}
+.kcard h3{margin:0;color:var(--muted);font-size:13px}
+.kcard .val{font-size:20px;font-weight:800;margin-top:4px}
 
-/* Flags UI */ .lang-flags{display:flex;gap:6px;align-items:center} .btn-flag{width:36px;height:36px;padding:0;font-size:18px;line-height:1;border-radius:10px} .btn-flag.active{outline:2px solid var(--accent)} </style>
+/* Modals */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.dialog{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:860px;width:100%;padding:16px;max-height:85vh;overflow:auto}
+.dialog h2{margin:0 0 10px;font-size:18px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.table{width:100%;border-collapse:separate;border-spacing:0 8px}
+thead th{font-size:12px;color:#334155} th,td{padding:8px 10px;text-align:center}
+tbody tr{background:#fff;border:1px solid var(--line)} .dark tbody tr{background:#0a1222;border-color:#1f2b40}
+tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
+tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
+/* Flags UI */
+.lang-flags{display:flex;gap:6px;align-items:center}
+.btn-flag{width:36px;height:36px;padding:0;font-size:18px;line-height:1;border-radius:10px}
+.btn-flag.active{outline:2px solid var(--accent)}
+</style>
 </head>
-<body><!-- Topbar --><div class="topbar">
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
   <div class="inner">
     <div class="brand">⏱️ <span id="brandTxt">ساعتي</span></div>
     <button id="navDay"      class="btn-sm">اليوم</button>
@@ -36,41 +88,47 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
     </div>
     <button id="themeBtn"    class="btn-sm">Dark</button>
   </div>
-</div><div class="wrap">
+</div>
+
+<div class="wrap">
   <!-- Day card -->
   <div class="card" id="dayCard">
     <h1 id="titleDay">الإدخال اليومي</h1>
-    <p class="small" id="hintDay">أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.</p><div class="date-row">
-  <div class="date-input">
-    <label id="lblDate">تاريخ</label>
-    <input id="dayDate" type="date" />
-  </div>
-  <div class="pill" id="dayName">—</div>
-</div>
+    <p class="small" id="hintDay">أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.</p>
 
-<div class="time-grid">
-  <div class="time-box start">
-    <div class="title" id="lblStart">🟢 دخول</div>
-    <input id="dayStart" type="time" />
-  </div>
-  <div class="time-box end">
-    <div class="title" id="lblEnd">🔴 خروج</div>
-    <input id="dayEnd" type="time" />
-  </div>
-  <div class="time-box break-col">
-    <div class="title" id="lblBreak">☕️ استراحة (دقيقة)</div>
-    <input id="dayBreak" type="number" min="0" step="5" value="30" />
-  </div>
-</div>
+    <div class="date-row">
+      <div class="date-input">
+        <label id="lblDate">تاريخ</label>
+        <input id="dayDate" type="date" />
+      </div>
+      <div class="pill" id="dayName">—</div>
+    </div>
 
-<div class="kpis">
-  <div class="kcard"><h3 id="k1">صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
-  <div class="kcard"><h3 id="k2">إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
-  <div class="kcard"><h3 id="k3">أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
-  <div class="kcard"><h3 id="k4">حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
-</div>
+    <div class="time-grid">
+      <div class="time-box start">
+        <div class="title" id="lblStart">🟢 دخول</div>
+        <input id="dayStart" type="time" />
+      </div>
+      <div class="time-box end">
+        <div class="title" id="lblEnd">🔴 خروج</div>
+        <input id="dayEnd" type="time" />
+      </div>
+      <div class="time-box break-col">
+        <div class="title" id="lblBreak">☕️ استراحة (دقيقة)</div>
+        <input id="dayBreak" type="number" min="0" step="5" value="30" />
+      </div>
+    </div>
 
-  </div>  <!-- Settings -->  <div class="card" id="settingsCard" style="display:none">
+    <div class="kpis">
+      <div class="kcard"><h3 id="k1">صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
+      <div class="kcard"><h3 id="k2">إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
+      <div class="kcard"><h3 id="k3">أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
+      <div class="kcard"><h3 id="k4">حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="card" id="settingsCard" style="display:none">
     <h1 id="titleSettings">الإعدادات</h1>
     <p class="small" id="hintSettings">اضبط القيم الافتراضية.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
@@ -85,7 +143,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
     </div>
     <button id="applySettings" class="btn-sm" style="margin-top:12px">حفظ</button>
   </div>
-</div><!-- Month modal --><div id="monthModal" class="modal" aria-hidden="true">
+</div>
+
+<!-- Month modal -->
+<div id="monthModal" class="modal" aria-hidden="true">
   <div class="dialog">
     <h2 id="titleMonth">ملخص شهري</h2>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -100,7 +161,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
     </div>
     <div class="actions"><button id="closeMonth" class="btn-sm">إغلاق</button></div>
   </div>
-</div><!-- Export modal --><div id="exportModal" class="modal" aria-hidden="true">
+</div>
+
+<!-- Export modal -->
+<div id="exportModal" class="modal" aria-hidden="true">
   <div class="dialog" style="max-width:520px">
     <h2 id="titleExport">تصدير</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -124,7 +188,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
       <button id="doExport" class="btn-sm">تصدير</button>
     </div>
   </div>
-</div><!-- libs: html2canvas فقط للصورة --><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script><script>
+</div>
+
+<!-- libs: html2canvas فقط للصورة -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+<script>
 // ===== I18N =====
 const I18N = {
   ar:{dir:'rtl',brand:'ساعتي',flag:'🇸🇦',nav:{day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير'},themeLight:'داكن',themeDark:'فاتح',day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم الحالي',optMonth:'الشهر المختار',cancel:'إلغاء',do:'تصدير',png:'صورة (PNG)',json:'JSON'}},
@@ -280,5 +348,6 @@ function initApp(){
   compute();
 }
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', initApp); } else { initApp(); }
-</script></body>
+</script>
+</body>
 </html>
