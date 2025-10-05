@@ -165,7 +165,7 @@
         <button class="btn-sm primary" id="doExport">تصدير</button>
       </div>
     </div>
-  </div>  <!-- jsPDF فقط للتصدير -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script>
+  </div>  <!-- jsPDF فقط للتصدير -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <!-- html2pdf (يعالج العربية والـRTL بتحويل المحتوى إلى صورة عالية الدقة داخل PDF) -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPQHf3Aq1m8nYtSbrd6r9k2u5du5vvC7vV8QOe8zjJz5h9n7Qp8hY5m9i1b8T2x0t2M3bR3i3Qn9YkQKf3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script>
   (function(){
     // عناصر عامة
     const themeBtn = document.getElementById('themeBtn');
@@ -276,9 +276,32 @@
     function getDayPayload(){ return { date:dayDate.value, start:dayStart.value, end:dayEnd.value, breakMin:parseInt(dayBreak.value||0,10), daily:parseFloat(stDaily.value||8) }; }
     function downloadJSON(filename, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
     function exportDayJSON(){ const data={ meta:{scope:'day',date:dayDate.value,exportedAt:new Date().toISOString()}, payload:getDayPayload() }; downloadJSON(`day-${dayDate.value}.json`, data); }
-    function exportDayPDF(){ const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pad=40; let y=pad; const sum=computeDay(); const p=getDayPayload(); doc.setFontSize(16); doc.text('تقرير يوم العمل — '+p.date, pad, y); y+=26; doc.setFontSize(12); doc.text(`البداية: ${p.start} — النهاية: ${p.end} — استراحة: ${p.breakMin}د`, pad, y); y+=18; doc.text(`الصافي: ${m2h(sum.net)} — الإضافي: ${m2h(sum.ot)} — أساس اليوم: ${stDaily.value}س`, pad, y); doc.save(`day-${p.date}.pdf`); }
+    function exportDayPDF(){
+      // نبني عنصر HTML نظيف للتصدير لضمان عرض العربية بشكل صحيح
+      const p=getDayPayload(); const sum=computeDay();
+      const wrapper=document.createElement('div');
+      wrapper.dir='rtl'; wrapper.style.cssText='font-family: system-ui, \"Noto Naskh Arabic\", Tahoma; padding:16px; color:#0f172a;';
+      wrapper.innerHTML=`
+        <h2 style="margin:0 0 8px">تقرير يوم العمل — ${p.date}</h2>
+        <div style="margin:6px 0">البداية: <strong>${p.start||'-'}</strong> — النهاية: <strong>${p.end||'-'}</strong> — الاستراحة: <strong>${p.breakMin||0} دقيقة</strong></div>
+        <div style="margin:6px 0">الصافي: <strong>${m2h(sum.net)}</strong> — الإضافي: <strong>${m2h(sum.ot)}</strong> — أساس اليوم: <strong>${stDaily.value} س</strong></div>
+      `;
+      const opt={ margin:10, filename:`day-${p.date}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'pt', format:'a4', orientation:'portrait'} };
+      html2pdf().from(wrapper).set(opt).save();
+    }
     function exportMonthJSON(){ const month=monthPick.value || dayDate.value.substring(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={ meta:{scope:'month',month,exportedAt:new Date().toISOString()}, rows, totals:{ total:mTotal.textContent, ot:mOT.textContent, days:mDays.textContent, avg:mAvg.textContent } }; downloadJSON(`month-${month}.json`, data); }
-    function exportMonthPDF(){ const month=monthPick.value || dayDate.value.substring(0,7); const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pad=40; let y=pad; doc.setFontSize(16); doc.text('تقرير الشهر — '+month, pad, y); y+=26; doc.setFontSize(11); const head=['التاريخ','البداية','النهاية','استراحة','الصافي','الإضافي']; doc.text(head.join(' | '), pad, y); y+=16; [...monthArea.querySelectorAll('tbody tr')].forEach(tr=>{ const line=[...tr.children].map(td=>td.textContent.trim()).join(' | '); doc.text(line, pad, y); y+=14; if(y>760){ doc.addPage(); y=pad; } }); y+=10; doc.text(`الإجمالي: ${mTotal.textContent} — الإضافي: ${mOT.textContent} — الأيام: ${mDays.textContent} — المعدل: ${mAvg.textContent}`, pad, y); doc.save(`month-${month}.pdf`); }
+    function exportMonthPDF(){
+      const month=monthPick.value || dayDate.value.substring(0,7);
+      // نبني HTML من جدول الملخص الموجود
+      const container=document.createElement('div');
+      container.dir='rtl'; container.style.cssText='font-family: system-ui, \"Noto Naskh Arabic\", Tahoma; padding:16px; color:#0f172a;';
+      const header=`<h2 style="margin:0 0 8px">تقرير الشهر — ${month}</h2>`;
+      const totals=`<div style="margin:6px 0">الإجمالي: <strong>${mTotal.textContent}</strong> — الإضافي: <strong>${mOT.textContent}</strong> — الأيام: <strong>${mDays.textContent}</strong> — المعدل: <strong>${mAvg.textContent}</strong></div>`;
+      const tableHTML = monthArea.innerHTML; // نفس الجدول المعروض
+      container.innerHTML = header + tableHTML + totals;
+      const opt={ margin:10, filename:`month-${month}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'pt', format:'a4', orientation:'portrait'} };
+      html2pdf().from(container).set(opt).save();
+    }
 
     // تنقل وعرض
     function showOnly(card){ [welcomeCard,dayCard,settingsCard].forEach(el=> el.style.display='none'); card.style.display='block'; }
@@ -324,4 +347,4 @@
     recomputeCounters();
   })();
   </script></body>
-</html>
+  </html>
