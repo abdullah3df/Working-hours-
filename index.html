@@ -1,350 +1,142 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ساعاتي — إدخال يومي + عدادات أسبوع/شهر + تصدير</title>
-  <style>
-    :root{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
-    .light{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
-    /* تحسين ظهور النص في الوضع الفاتح داخل الحقول والجداول */
-    .light input, .light select, .light button{background:#ffffff;color:#0f172a;border-color:#e2e8f0}
-    .light .btn-sm{background:#ffffff;color:#0f172a;border-color:#e2e8f0}
-    .light .kcard, .light tbody tr{background:#ffffff;border-color:#e2e8f0;color:#0f172a}
-    .light .table thead th{color:#334155}
-    .light .tag{border-color:#e2e8f0}
-    .light ::placeholder{color:#64748b;opacity:1}
-    /* ضبط ألوان حقول التاريخ/الوقت في متصفح كروم/أندرويد */
-    input, select{color-scheme: dark}
-    .light input, .light select{color-scheme: light}
-    input[type="time"]::-webkit-datetime-edit, input[type="date"]::-webkit-datetime-edit{color:inherit}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
-    a{color:inherit;text-decoration:none}
-    .topbar{position:sticky;top:0;z-index:10;background:#0c1426;border-bottom:1px solid #1f2b40}
-    .topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:10px;align-items:center}
-    .brand{font-weight:800}
-    .nav{display:flex;gap:8px;align-items:center}
-    .spacer{flex:1}
-    .btn-sm{padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;background:#0a1222;color:#e5e7eb;cursor:pointer}
-    .btn-sm.primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none}
-    .wrap{max-width:1060px;margin:24px auto;padding:16px 12px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    h1{margin:0 0 8px;font-size:clamp(20px,3vw,28px)}
-    p.small{color:var(--muted);margin:0 0 12px}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .col{flex:1 1 220px;min-width:0}
-    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
-    input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink);min-width:0}
-    input[type="time"], input[type="date"], input[type="number"]{direction:ltr}
-    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:8px}
-    .kcard{border:1px solid var(--line);background:#0a1222;border-radius:12px;padding:12px;text-align:center}
-    .kcard h3{margin:0;color:var(--muted);font-size:12px}
-    .kcard .val{font-size:20px;font-weight:700;margin-top:6px}
-    .sep{height:1px;background:var(--line);margin:14px 0}
-    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
-    th,td{padding:10px 12px;text-align:center}
-    thead th{font-size:12px;color:#93a4b9}
-    tbody tr{background:#0a1222;border:1px solid #1f2b40}
-    tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
-    tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
-    .modal.open{display:flex}
-    .dialog{background:#0e1528;border:1px solid #1f2b40;border-radius:16px;max-width:860px;width:100%;padding:16px;max-height:85vh;overflow:auto}
-    .dialog h2{margin:0 0 10px;font-size:18px}
-    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ساعاتي — حاسبة الدوام اليومية</title>
+<style>
+:root{
+  --bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;
+  --line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa
+}
+.light{
+  --bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;
+  --line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6
+}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,"Noto Naskh Arabic",Tahoma,sans-serif
+}
+.wrap{max-width:720px;margin:24px auto;padding:16px;}
+.card{background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px;box-shadow:0 4px 18px rgba(0,0,0,.25);}
+h1{margin:0 0 8px;font-size:20px}
+p.small{color:var(--muted);margin:0 0 12px}
+
+/* الشريط العلوي */
+.topbar{
+  position:sticky;top:0;z-index:20;background:#0c1426;
+  border-bottom:1px solid #1f2b40;
+}
+.topbar .inner{
+  max-width:1060px;margin:0 auto;padding:10px 12px;
+  display:flex;gap:8px;align-items:center;
+  flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.topbar .inner::-webkit-scrollbar{display:none;}
+.topbar .inner button{
+  flex-shrink:0;white-space:nowrap;height:36px;
+}
+.brand{font-weight:800;flex-shrink:0;}
+.spacer{flex:1}
+.btn-sm{
+  padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;
+  background:#0a1222;color:#e5e7eb;cursor:pointer;font-size:14px;
+}
+.light .btn-sm{background:#ffffff;color:#0f172a;border-color:#e2e8f0;}
+#themeBtn{order:99;}
+
+/* مدخلات */
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:4px}
+input{width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);
+background:#0a1222;color:var(--ink)}
+.light input{background:#ffffff;color:#0f172a;border-color:#e2e8f0}
+input[type=time],input[type=date],input[type=number]{direction:ltr}
+
+/* بطاقات القيم */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.kcard{border:1px solid var(--line);background:#0a1222;border-radius:12px;padding:12px;text-align:center}
+.light .kcard{background:#ffffff;color:#0f172a;border-color:#e2e8f0;}
+.kcard h3{margin:0;color:var(--muted);font-size:13px}
+.kcard .val{font-size:20px;font-weight:700;margin-top:4px}
+.primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none;color:#fff;cursor:pointer}
+</style>
 </head>
-<body class="light">
-  <div class="topbar">
-    <div class="inner">
-      <div class="brand">⏱️ ساعاتي</div>
-      <div class="nav">
-        <button id="navWelcome" class="btn-sm">الرئيسية</button>
-        <button id="navDay" class="btn-sm">اليوم</button>
-        <button id="navMonth" class="btn-sm">الشهري</button>
-        <button id="navSettings" class="btn-sm">الإعدادات</button>
-        <button id="navExport" class="btn-sm">تصدير</button>
-      </div>
-      <div class="spacer"></div>
-      <button id="themeBtn" class="btn-sm">ثيم داكن</button>
-    </div>
-  </div>  <div class="wrap">
-    <!-- صفحة ترحيب بدون تسجيل دخول -->
-    <div class="card" id="welcomeCard">
-      <h1>أهلًا بك في <strong>ساعاتي</strong></h1>
-      <p class="small">ابدأ بتسجيل ساعات يومك مباشرة. لا تحتاج لتسجيل دخول.</p>
-      <div class="row" style="margin-top:8px">
-        <div class="col"><button class="btn-sm primary" id="welcomeStart">ابدأ الآن</button></div>
-        <div class="col"><button class="btn-sm" id="welcomeSettings">الإعدادات أولًا</button></div>
-      </div>
-    </div><!-- إدخال يومي فقط -->
-<div class="card" id="dayCard" style="display:none">
-  <h1>الإدخال اليومي</h1>
-  <p class="small">اختر التاريخ وأدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.</p>
-  <div class="row">
-    <div class="col"><label>تاريخ</label><input type="date" id="dayDate"></div>
-    <div class="col"><label>بداية</label><input type="time" id="dayStart"></div>
-    <div class="col"><label>نهاية</label><input type="time" id="dayEnd"></div>
-    <div class="col"><label>استراحة (دقيقة)</label><input type="number" id="dayBreak" min="0" step="5" value="30"></div>
-  </div>
-  <div class="kpis" style="margin-top:12px">
-    <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
-    <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
-    <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
-    <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
-  </div>
+<body>
 
-  <div class="sep"></div>
-  <h2 style="margin:0 0 8px;font-size:18px">عدادات حيّة</h2>
-  <div class="kpis">
-    <div class="kcard"><h3>مجموع الأسبوع (حتى اليوم)</h3><div class="val" id="wTotal">0:00</div></div>
-    <div class="kcard"><h3>مقابل الهدف الأسبوعي</h3><div class="val" id="wDelta">0:00</div></div>
-    <div class="kcard"><h3>مجموع الشهر (حتى اليوم)</h3><div class="val" id="moTotal">0:00</div></div>
-    <div class="kcard"><h3>مقابل الهدف الشهري</h3><div class="val" id="moDelta">0:00</div></div>
-  </div>
-
-  <div class="row" style="margin-top:12px">
-    <div class="col"><button class="btn-sm primary" id="saveDay">حفظ اليوم</button></div>
-    <div class="col"><button class="btn-sm" id="openMonth">ملخص شهر</button></div>
+<!-- الشريط -->
+<div class="topbar">
+  <div class="inner">
+    <div class="brand">⏱️ ساعاتي</div>
+    <button id="navHome" class="btn-sm">الرئيسية</button>
+    <button id="navDay" class="btn-sm">اليوم</button>
+    <button id="navMonth" class="btn-sm">الشهري</button>
+    <button id="navSettings" class="btn-sm">الإعدادات</button>
+    <button id="navExport" class="btn-sm">تصدير</button>
+    <button id="themeBtn" class="btn-sm">ثيم مريح 🌙</button>
   </div>
 </div>
 
-<!-- الإعدادات -->
-<div class="card" id="settingsCard" style="display:none">
-  <h1>الإعدادات</h1>
-  <p class="small">عدّل الأساس اليومي/الأسبوعي والاستراحة الافتراضية. تُحفظ محليًا.</p>
-  <div class="row">
-    <div class="col"><label>الأساس اليومي (ساعات)</label><input id="stDaily" type="number" min="0" step="0.25" value="8"></div>
-    <div class="col"><label>الأساس الأسبوعي (ساعات)</label><input id="stWeekly" type="number" min="0" step="0.5" value="40"></div>
-    <div class="col"><label>استراحة افتراضية (دقائق)</label><input id="stBreak" type="number" min="0" step="5" value="30"></div>
-  </div>
-  <div class="row" style="margin-top:8px">
-    <div class="col"><button id="applySettings" class="btn-sm">تطبيق الآن</button></div>
+<div class="wrap">
+  <div class="card" id="dayCard">
+    <h1>الإدخال اليومي</h1>
+    <p class="small">اختر التاريخ وأدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.</p>
+    <label>تاريخ</label>
+    <input type="date" id="dayDate">
+    <label>بداية</label>
+    <input type="time" id="dayStart">
+    <label>نهاية</label>
+    <input type="time" id="dayEnd">
+    <label>استراحة (دقيقة)</label>
+    <input type="number" id="dayBreak" value="30" min="0" step="5">
+    <div class="kpis">
+      <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
+      <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
+      <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
+      <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
+    </div>
+    <button id="saveDay" class="primary" style="width:100%;margin-top:12px">💾 حفظ اليوم</button>
   </div>
 </div>
 
-  </div>  <!-- ملخص شهري -->  <div id="monthModal" class="modal" aria-hidden="true">
-    <div class="dialog">
-      <h2>ملخص شهري</h2>
-      <div class="row">
-        <div class="col"><label>اختر الشهر</label><input type="month" id="monthPick"></div>
-        <div class="col"><button class="btn-sm" id="refreshMonth">تحديث</button></div>
-      </div>
-      <div id="monthArea" style="margin-top:12px"></div>
-      <div class="kpis">
-        <div class="kcard"><h3>مجموع الشهر</h3><div class="val" id="mTotal">0:00</div></div>
-        <div class="kcard"><h3>إضافي الشهر</h3><div class="val" id="mOT">0:00</div></div>
-        <div class="kcard"><h3>أيام مسجلة</h3><div class="val" id="mDays">0</div></div>
-        <div class="kcard"><h3>معدل اليوم</h3><div class="val" id="mAvg">0:00</div></div>
-      </div>
-      <div class="actions" style="margin-top:12px">
-        <button class="btn-sm" id="closeMonth">إغلاق</button>
-      </div>
-    </div>
-  </div>  <!-- نافذة التصدير -->  <div id="exportModal" class="modal" aria-hidden="true">
-    <div class="dialog" style="max-width:520px">
-      <h2>تصدير</h2>
-      <div class="row">
-        <div class="col">
-          <label>النطاق</label>
-          <select id="expScope">
-            <option value="day">اليوم الحالي</option>
-            <option value="month">الشهر المختار</option>
-          </select>
-        </div>
-        <div class="col">
-          <label>الصيغة</label>
-          <select id="expFormat">
-            <option value="pdf">PDF</option>
-            <option value="json">JSON</option>
-          </select>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn-sm" id="closeExport">إلغاء</button>
-        <button class="btn-sm primary" id="doExport">تصدير</button>
-      </div>
-    </div>
-  </div>  <!-- jsPDF فقط للتصدير -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <!-- html2pdf (يعالج العربية والـRTL بتحويل المحتوى إلى صورة عالية الدقة داخل PDF) -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPQHf3Aq1m8nYtSbrd6r9k2u5du5vvC7vV8QOe8zjJz5h9n7Qp8hY5m9i1b8T2x0t2M3bR3i3Qn9YkQKf3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script>
-  (function(){
-    // عناصر عامة
-    const themeBtn = document.getElementById('themeBtn');
-    const navWelcome = document.getElementById('navWelcome');
-    const navDay = document.getElementById('navDay');
-    const navMonth = document.getElementById('navMonth');
-    const navSettings = document.getElementById('navSettings');
-    const navExport = document.getElementById('navExport');
+<script>
+const themeBtn=document.getElementById("themeBtn");
+themeBtn.onclick=()=>{
+  document.body.classList.toggle("light");
+  themeBtn.textContent=document.body.classList.contains("light")?"ثيم داكن 🌙":"ثيم مريح ☀️";
+};
 
-    const welcomeCard = document.getElementById('welcomeCard');
-    const dayCard = document.getElementById('dayCard');
-    const settingsCard = document.getElementById('settingsCard');
+const dayDate=document.getElementById("dayDate");
+const dayStart=document.getElementById("dayStart");
+const dayEnd=document.getElementById("dayEnd");
+const dayBreak=document.getElementById("dayBreak");
+const dNet=document.getElementById("dNet");
+const dOT=document.getElementById("dOT");
+const dBase=document.getElementById("dBase");
+const dSave=document.getElementById("dSave");
+const saveDay=document.getElementById("saveDay");
 
-    // يومي
-    const dayDate = document.getElementById('dayDate');
-    const dayStart = document.getElementById('dayStart');
-    const dayEnd = document.getElementById('dayEnd');
-    const dayBreak = document.getElementById('dayBreak');
-    const dNet = document.getElementById('dNet');
-    const dOT = document.getElementById('dOT');
-    const dBase = document.getElementById('dBase');
-    const dSave = document.getElementById('dSave');
-    const saveDayBtn = document.getElementById('saveDay');
-    const openMonthBtn = document.getElementById('openMonth');
+dayDate.value=new Date().toISOString().slice(0,10);
 
-    // الإعدادات
-    const stDaily = document.getElementById('stDaily');
-    const stWeekly = document.getElementById('stWeekly');
-    const stBreak = document.getElementById('stBreak');
-    const applySettings = document.getElementById('applySettings');
+function h2m(h){if(!h)return 0;const [HH,MM]=h.split(":").map(Number);return HH*60+(MM||0);}
+function m2h(m){const hh=Math.floor(m/60),mm=Math.round(m%60);return `${hh}:${mm.toString().padStart(2,"0")}`;}
 
-    // عدادات أسبوع/شهر
-    const wTotal = document.getElementById('wTotal');
-    const wDelta = document.getElementById('wDelta');
-    const moTotal = document.getElementById('moTotal');
-    const moDelta = document.getElementById('moDelta');
+function computeDay(){
+  const s=dayStart.value,e=dayEnd.value,br=parseInt(dayBreak.value||0);
+  if(!s||!e){dNet.textContent="0:00";dOT.textContent="0:00";return;}
+  let sm=h2m(s),em=h2m(e);if(em<sm)em+=1440;
+  const base=8*60;const total=(em-sm)-br;const ot=Math.max(0,total-base);
+  dNet.textContent=m2h(total);dOT.textContent=m2h(ot);
+}
 
-    // ملخص شهري
-    const monthModal = document.getElementById('monthModal');
-    const monthPick = document.getElementById('monthPick');
-    const refreshMonth = document.getElementById('refreshMonth');
-    const monthArea = document.getElementById('monthArea');
-    const closeMonth = document.getElementById('closeMonth');
-    const mTotal = document.getElementById('mTotal');
-    const mOT = document.getElementById('mOT');
-    const mDays = document.getElementById('mDays');
-    const mAvg = document.getElementById('mAvg');
+[dayStart,dayEnd,dayBreak].forEach(el=>el.addEventListener("input",computeDay));
 
-    // تصدير
-    const exportModal = document.getElementById('exportModal');
-    const expScope = document.getElementById('expScope');
-    const expFormat = document.getElementById('expFormat');
-    const closeExport = document.getElementById('closeExport');
-    const doExport = document.getElementById('doExport');
-
-    // ترحيب
-    const welcomeStart = document.getElementById('welcomeStart');
-    const welcomeSettings = document.getElementById('welcomeSettings');
-
-    // أدوات وقت/تنسيق
-    const LS_WELCOME_KEY='seenWelcome_v2';
-    function h2m(h){ if(!h) return 0; const [HH,MM]=h.split(':').map(Number); return HH*60+(MM||0) }
-    function m2h(m){ const sign=m<0?'-':''; m=Math.abs(m); const hh=Math.floor(m/60); const mm=Math.round(m%60); return sign+hh+':'+mm.toString().padStart(2,'0') }
-    function fmtDate(d){ return d.toISOString().slice(0,10) }
-    function parseDate(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d) }
-    function startOfWeek(d){ const x=new Date(d); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return new Date(x.getFullYear(),x.getMonth(),x.getDate()) }
-    function endOfWeek(d){ const s=startOfWeek(d); s.setDate(s.getDate()+6); return s }
-
-    // إعدادات
-    function loadSettings(){ const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stWeekly.value=s.weekly??40; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value); }
-    function saveSettings(){ const s={ daily:parseFloat(stDaily.value||8), weekly:parseFloat(stWeekly.value||40), break:parseInt(stBreak.value||30,10) }; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); }
-
-    // تخزين يومي
-    function saveDayLocal(){ const payload={ date:dayDate.value, start:dayStart.value, end:dayEnd.value, breakMin:parseInt(dayBreak.value||0,10), daily:parseFloat(stDaily.value||8) }; localStorage.setItem('otDay-'+payload.date, JSON.stringify(payload)); }
-    function loadDayLocal(dateStr){ const raw=localStorage.getItem('otDay-'+dateStr); if(raw){ try{ const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=(p.breakMin??stBreak.value)||0; }catch{} } }
-
-    // حساب اليوم + العدادات
-    function computeDay(){ const baseDayMin=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=parseInt(dayBreak.value||0,10); if(!s||!e){ dNet.textContent='0:00'; dOT.textContent='0:00'; dBase.textContent=String(parseFloat(stDaily.value||8)); return {net:0,ot:0,valid:false}; } let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-baseDayMin); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(parseFloat(stDaily.value||8)); return {net,ot,valid:true}; }
-
-    function recomputeCounters(){
-      const today=parseDate(dayDate.value);
-      const ws=startOfWeek(today), we=endOfWeek(today);
-      let wSum=0; for(let d=new Date(ws); d<=we; d.setDate(d.getDate()+1)){ const raw=localStorage.getItem('otDay-'+fmtDate(d)); if(raw){ try{ const p=JSON.parse(raw); if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; wSum += Math.max(0,(em-sm)-(parseInt(p.breakMin||0,10))); } }catch{} } }
-      const weeklyTarget = Math.round(parseFloat(stWeekly.value||40)*60);
-      wTotal.textContent=m2h(wSum);
-      wDelta.textContent=(wSum>=weeklyTarget?'+':'−')+m2h(Math.abs(wSum-weeklyTarget));
-
-      // شهر
-      const y=today.getFullYear(), m=today.getMonth();
-      let mSum=0, workdaysPassed=0;
-      for(let d=new Date(y,m,1); d<=today; d.setDate(d.getDate()+1)){
-        const wd=d.getDay(); if(wd>=1 && wd<=5) workdaysPassed++; // Mon-Fri
-        const raw=localStorage.getItem('otDay-'+fmtDate(d)); if(raw){ try{ const p=JSON.parse(raw); if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; mSum += Math.max(0,(em-sm)-(parseInt(p.breakMin||0,10))); } }catch{} }
-      }
-      moTotal.textContent=m2h(mSum);
-      const monthlyTarget = workdaysPassed*Math.round(parseFloat(stDaily.value||8)*60);
-      moDelta.textContent=(mSum>=monthlyTarget?'+':'−')+m2h(Math.abs(mSum-monthlyTarget));
-    }
-
-    // ملخص شهري
-    function openMonthModal(){ monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary(); }
-    function closeMonthModal(){ monthModal.classList.remove('open'); monthModal.setAttribute('aria-hidden','true'); }
-    async function refreshMonthSummary(){ const month=monthPick.value || dayDate.value.substring(0,7); const list=[]; const y=parseInt(month.substring(0,4),10), mo=parseInt(month.substring(5,7),10)-1; const first=new Date(y,mo,1); const last=new Date(y,mo+1,0); for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){ const raw=localStorage.getItem('otDay-'+fmtDate(d)); if(raw){ try{ const p=JSON.parse(raw); list.push(p); }catch{} } } list.sort((a,b)=> a.date<b.date?-1:1); let html='<table class="table"><thead><tr><th>التاريخ</th><th>البداية</th><th>النهاية</th><th>استراحة</th><th>الصافي</th><th>إضافي</th></tr></thead><tbody>'; let total=0, daysCount=0; const baseDayMin=Math.round(parseFloat(stDaily.value||8)*60); list.forEach(p=>{ if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const br=parseInt(p.breakMin||0,10); const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-baseDayMin); total+=net; daysCount++; html+=`<tr><td>${p.date}</td><td>${p.start}</td><td>${p.end}</td><td>${p.breakMin}</td><td>${m2h(net)}</td><td>${m2h(ot)}</td></tr>`; } }); html+='</tbody></table>'; monthArea.innerHTML=html; const otMonth=Math.max(0,total-(daysCount*baseDayMin)); mTotal.textContent=m2h(total); mOT.textContent=m2h(otMonth); mDays.textContent=String(daysCount); mAvg.textContent=daysCount? m2h(Math.round(total/daysCount)):'0:00'; }
-
-    // تصدير
-    function openExport(){ exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false'); }
-    function closeExportMod(){ exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); }
-    function getDayPayload(){ return { date:dayDate.value, start:dayStart.value, end:dayEnd.value, breakMin:parseInt(dayBreak.value||0,10), daily:parseFloat(stDaily.value||8) }; }
-    function downloadJSON(filename, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
-    function exportDayJSON(){ const data={ meta:{scope:'day',date:dayDate.value,exportedAt:new Date().toISOString()}, payload:getDayPayload() }; downloadJSON(`day-${dayDate.value}.json`, data); }
-    function exportDayPDF(){
-      // نبني عنصر HTML نظيف للتصدير لضمان عرض العربية بشكل صحيح
-      const p=getDayPayload(); const sum=computeDay();
-      const wrapper=document.createElement('div');
-      wrapper.dir='rtl'; wrapper.style.cssText='font-family: system-ui, \"Noto Naskh Arabic\", Tahoma; padding:16px; color:#0f172a;';
-      wrapper.innerHTML=`
-        <h2 style="margin:0 0 8px">تقرير يوم العمل — ${p.date}</h2>
-        <div style="margin:6px 0">البداية: <strong>${p.start||'-'}</strong> — النهاية: <strong>${p.end||'-'}</strong> — الاستراحة: <strong>${p.breakMin||0} دقيقة</strong></div>
-        <div style="margin:6px 0">الصافي: <strong>${m2h(sum.net)}</strong> — الإضافي: <strong>${m2h(sum.ot)}</strong> — أساس اليوم: <strong>${stDaily.value} س</strong></div>
-      `;
-      const opt={ margin:10, filename:`day-${p.date}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'pt', format:'a4', orientation:'portrait'} };
-      html2pdf().from(wrapper).set(opt).save();
-    }
-    function exportMonthJSON(){ const month=monthPick.value || dayDate.value.substring(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={ meta:{scope:'month',month,exportedAt:new Date().toISOString()}, rows, totals:{ total:mTotal.textContent, ot:mOT.textContent, days:mDays.textContent, avg:mAvg.textContent } }; downloadJSON(`month-${month}.json`, data); }
-    function exportMonthPDF(){
-      const month=monthPick.value || dayDate.value.substring(0,7);
-      // نبني HTML من جدول الملخص الموجود
-      const container=document.createElement('div');
-      container.dir='rtl'; container.style.cssText='font-family: system-ui, \"Noto Naskh Arabic\", Tahoma; padding:16px; color:#0f172a;';
-      const header=`<h2 style="margin:0 0 8px">تقرير الشهر — ${month}</h2>`;
-      const totals=`<div style="margin:6px 0">الإجمالي: <strong>${mTotal.textContent}</strong> — الإضافي: <strong>${mOT.textContent}</strong> — الأيام: <strong>${mDays.textContent}</strong> — المعدل: <strong>${mAvg.textContent}</strong></div>`;
-      const tableHTML = monthArea.innerHTML; // نفس الجدول المعروض
-      container.innerHTML = header + tableHTML + totals;
-      const opt={ margin:10, filename:`month-${month}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'pt', format:'a4', orientation:'portrait'} };
-      html2pdf().from(container).set(opt).save();
-    }
-
-    // تنقل وعرض
-    function showOnly(card){ [welcomeCard,dayCard,settingsCard].forEach(el=> el.style.display='none'); card.style.display='block'; }
-    navWelcome.addEventListener('click', ()=> showOnly(welcomeCard));
-    navDay.addEventListener('click', ()=> showOnly(dayCard));
-    navMonth.addEventListener('click', ()=> openMonthModal());
-    navSettings.addEventListener('click', ()=>{ loadSettings(); showOnly(settingsCard); });
-    navExport.addEventListener('click', ()=> openExport());
-    themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
-
-    // ترحيب
-    if(localStorage.getItem(LS_WELCOME_KEY)==='1'){ showOnly(dayCard); } else { showOnly(welcomeCard); }
-    welcomeStart.addEventListener('click', ()=>{ localStorage.setItem(LS_WELCOME_KEY,'1'); showOnly(dayCard); });
-    welcomeSettings.addEventListener('click', ()=>{ localStorage.setItem(LS_WELCOME_KEY,'1'); loadSettings(); showOnly(settingsCard); });
-
-    // يومي روابط
-    [dayStart, dayEnd, dayBreak].forEach(el=> el.addEventListener('input', ()=>{ computeDay(); }));
-    dayDate.addEventListener('change', ()=>{ loadDayLocal(dayDate.value); computeDay(); recomputeCounters(); });
-    saveDayBtn.addEventListener('click', ()=>{ saveDayLocal(); dSave.textContent='تم الحفظ'; setTimeout(()=> dSave.textContent='—',1200); recomputeCounters(); });
-    openMonthBtn.addEventListener('click', openMonthModal);
-
-    // ملخص شهري روابط
-    closeMonth.addEventListener('click', closeMonthModal);
-    refreshMonth.addEventListener('click', refreshMonthSummary);
-
-    // تصدير روابط
-    closeExport.addEventListener('click', closeExportMod);
-    doExport.addEventListener('click', async ()=>{ 
-      if(expScope.value==='day'){ expFormat.value==='json' ? exportDayJSON() : exportDayPDF(); }
-      else { await refreshMonthSummary(); expFormat.value==='json' ? exportMonthJSON() : exportMonthPDF(); }
-      closeExportMod();
-    });
-
-    // إعدادات
-    applySettings.addEventListener('click', ()=>{ saveSettings(); computeDay(); recomputeCounters(); alert('تم تطبيق الإعدادات'); });
-
-    // تهيئة
-    loadSettings();
-    document.body.classList.add('light'); themeBtn.textContent='ثيم داكن';
-    dayDate.value = new Date().toISOString().slice(0,10);
-    loadDayLocal(dayDate.value);
-    computeDay();
-    recomputeCounters();
-  })();
-  </script></body>
-  </html>
+saveDay.onclick=()=>{
+  const payload={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:dayBreak.value};
+  localStorage.setItem("day-"+dayDate.value,JSON.stringify(payload));
+  dSave.textContent="تم الحفظ ✅";setTimeout(()=>dSave.textContent="—",2000);
+};
+</script>
+</body>
+</html>
