@@ -5,6 +5,8 @@
   <title>ساعاتي — حاسبة الدوام والإضافي مع حسابات</title>
   <style>
     :root{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
+    /* ثيم فاتح مريح للعين */
+    .light{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
     .wrap{max-width:1060px;margin:24px auto;padding:16px 12px}
@@ -81,6 +83,11 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   <div class="topbar">
     <div class="inner">
       <div class="brand">⏱️ ساعاتي</div>
+      <button id="themeBtn" class="btn-sm" title="تبديل الثيم">ثيم مريح</button>
+      <select id="modeSelect" class="btn-sm" title="وضع الإدخال">
+        <option value="day">يومي</option>
+        <option value="week">أسبوعي</option>
+      </select>
       <div class="spacer"></div>
       <div id="userArea" class="dropdown">
         <button id="userBtn" class="btn-sm">تسجيل الدخول</button>
@@ -122,9 +129,30 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       </div>
     </div>
   </div>  <div class=\"wrap\">
-    <div class="card">
-      <h1>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</h1>
-      <p class="small">أدخل أوقاتك لكل يوم. إذا كنت مسجلاً بحساب، سيتم حفظ أسابيعك في السحابة (Firestore) وربطها بحسابك.</p><div class="row">
+    <div class="card" id="dayCard">
+      <h1>إدخال يومي — أسجل كل يوم بيومه</h1>
+      <p class="small">اختر تاريخ اليوم وأدخل بدايته ونهايته والاستراحة. يتم الحفظ تلقائيًا على حسابك، مع ملخص شهر كامل.</p>
+      <div class="row">
+        <div class="col"><label>تاريخ اليوم</label><input type="date" id="dayDate"></div>
+        <div class="col"><label>بداية</label><input type="time" id="dayStart"></div>
+        <div class="col"><label>نهاية</label><input type="time" id="dayEnd"></div>
+        <div class="col"><label>استراحة (د)</label><input type="number" id="dayBreak" min="0" step="5" value="30"></div>
+      </div>
+      <div class="kpis" style="margin-top:12px">
+        <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
+        <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
+        <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
+        <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="col"><button class="primary" id="saveDay">حفظ هذا اليوم</button></div>
+        <div class="col"><button class="ghost" id="openMonth">ملخص شهر</button></div>
+      </div>
+    </div><div class="card" id="weekCard" style="display:none">
+  <h1>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</h1>
+  <p class="small">أدخل أوقاتك لكل يوم. إذا كنت مسجلاً بحساب، سيتم حفظ أسابيعك في السحابة (Firestore) وربطها بحسابك.</p>
+
+  <div class="row">
     <div class="col">
       <label>ابدأ من أسبوع (اختر تاريخ يوم الاثنين)</label>
       <input type="date" id="weekStart" />
@@ -169,6 +197,24 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   </div>
 </div>
 
+  </div>  <!-- ملخص شهري -->  <div id="monthModal" class="modal" aria-hidden="true">
+    <div class="dialog" style="max-width:860px">
+      <h2>ملخص شهري</h2>
+      <div class="row">
+        <div class="col"><label>اختر الشهر</label><input type="month" id="monthPick"></div>
+        <div class="col"><button class="btn" id="refreshMonth">تحديث</button></div>
+      </div>
+      <div id="monthArea" style="margin-top:12px"></div>
+      <div class="kpis">
+        <div class="kcard"><h3>مجموع الشهر</h3><div class="val" id="mTotal">0:00</div></div>
+        <div class="kcard"><h3>إضافي الشهر</h3><div class="val" id="mOT">0:00</div></div>
+        <div class="kcard"><h3>أيام مسجلة</h3><div class="val" id="mDays">0</div></div>
+        <div class="kcard"><h3>معدل اليوم</h3><div class="val" id="mAvg">0:00</div></div>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn-sm" id="closeMonth">إغلاق</button>
+      </div>
+    </div>
   </div>  <!-- Firebase SDKs (اختياري/موصى به لإتاحة الحسابات السحابية) -->  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>  <!-- jsPDF للتصدير PDF -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/F3xkDk5FZ+8+qJwVqFjvUeQ7P8kJcLqQp4C7cQf4uY2a7i3xW+o8W6y6EoDq8n8pXbZl9m1OQh4Gv1y3bV1sQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><script>
 (function(){
   // === إعداد Firebase (بدّل القيم أدناه من مشروعك) ===
@@ -188,6 +234,31 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
   // ======= عناصر الواجهة العامة =======
   const cal = document.getElementById('calendar');
+  // عناصر وضع يومي
+  const dayCard = document.getElementById('dayCard');
+  const weekCard = document.getElementById('weekCard');
+  const modeSelect = document.getElementById('modeSelect');
+  const themeBtn = document.getElementById('themeBtn');
+  const dayDate = document.getElementById('dayDate');
+  const dayStart = document.getElementById('dayStart');
+  const dayEnd = document.getElementById('dayEnd');
+  const dayBreak = document.getElementById('dayBreak');
+  const dNet = document.getElementById('dNet');
+  const dOT = document.getElementById('dOT');
+  const dBase = document.getElementById('dBase');
+  const dSave = document.getElementById('dSave');
+  const saveDayBtn = document.getElementById('saveDay');
+  const openMonthBtn = document.getElementById('openMonth');
+  // ملخص شهري
+  const monthModal = document.getElementById('monthModal');
+  const monthPick = document.getElementById('monthPick');
+  const refreshMonth = document.getElementById('refreshMonth');
+  const monthArea = document.getElementById('monthArea');
+  const closeMonth = document.getElementById('closeMonth');
+  const mTotal = document.getElementById('mTotal');
+  const mOT = document.getElementById('mOT');
+  const mDays = document.getElementById('mDays');
+  const mAvg = document.getElementById('mAvg');
   const weekStartEl = document.getElementById('weekStart');
   const rangeLbl = document.getElementById('rangeLbl');
   const btnPrev = document.getElementById('prevWeek');
@@ -213,6 +284,9 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   const userMenu = document.getElementById('userMenu');
   const avatar = document.getElementById('avatar');
   const authModal = document.getElementById('authModal');
+  // ==== ثيم ووضع الإدخال ====
+  themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
+  modeSelect.addEventListener('change', ()=>{ const m=modeSelect.value; dayCard.style.display = m==='day'? 'block':'none'; weekCard.style.display = m==='week'? 'block':'none'; });
   const uName = document.getElementById('uName');
   const uEmail = document.getElementById('uEmail');
   const uPass = document.getElementById('uPass');
@@ -246,6 +320,8 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   function m2h(m){ const sign=m<0?'-':''; m=Math.abs(m); const hh=Math.floor(m/60); const mm=Math.round(m%60); return `${sign}${hh}:${mm.toString().padStart(2,'0')}` }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
   function weekKey(){ return weekStartEl.value }
+  function dayKey(){ return dayDate.value }
+  function monthKeyFromDateStr(d){ return d.substring(0,7) }
 
   // ======= بناء واجهة اليوم =======
   function buildDayCard(dayObj, weekStart){
@@ -284,6 +360,63 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     const start = parseDate(weekStartEl.value);
     const end = addDays(start,5);
     rangeLbl.textContent = `${start.toLocaleDateString('de-DE')} — ${end.toLocaleDateString('de-DE')}`;
+    days.forEach(d=> cal.appendChild(buildDayCard(d, start)));
+    loadStateForWeek().then(()=> commit());
+  }
+  // ===== وضع يومي =====
+  function computeDay(){
+    const s=dayStart.value, e=dayEnd.value, br=clamp(parseInt(dayBreak.value||0,10),0,600);
+    if(!s||!e){ dNet.textContent='0:00'; dOT.textContent='0:00'; return {min:0,ot:0,valid:false}; }
+    let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440;
+    const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
+    const total=Math.max(0,(em-sm)-br); const ot=Math.max(0,total-baseDayMin);
+    dNet.textContent=m2h(total); dOT.textContent=m2h(ot); dBase.textContent = String(parseFloat(baselineDayEl.value||8));
+    return {min:total, ot, valid:true};
+  }
+  async function saveDay(){
+    const calc = computeDay();
+    const payload = { date: dayKey(), start: dayStart.value, end: dayEnd.value, breakMin: dayBreak.value, baselineDay: baselineDayEl.value, month: monthKeyFromDateStr(dayKey()) };
+    localStorage.setItem('otDay-'+dayKey(), JSON.stringify(payload));
+    if(firebaseReady && auth.currentUser){
+      await db.collection('users').doc(auth.currentUser.uid).collection('days').doc(dayKey()).set(payload, {merge:true});
+    }
+    dSave.textContent = 'تم الحفظ'; setTimeout(()=> dSave.textContent='—', 1500);
+  }
+  async function loadDay(){
+    dSave.textContent='—';
+    const local = localStorage.getItem('otDay-'+dayKey());
+    if(local){ try{ const p=JSON.parse(local); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.breakMin||30; }catch{} }
+    if(firebaseReady && auth.currentUser){
+      const snap = await db.collection('users').doc(auth.currentUser.uid).collection('days').doc(dayKey()).get();
+      if(snap.exists){ const p=snap.data(); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.breakMin||30; }
+    }
+    computeDay();
+  }
+  function openMonthModal(){ monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary(); }
+  function closeMonthModal(){ monthModal.classList.remove('open'); monthModal.setAttribute('aria-hidden','true'); }
+  async function refreshMonthSummary(){
+    const month = monthPick.value || monthKeyFromDateStr(new Date().toISOString());
+    // اجمع من المحلي
+    const list=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i); if(k && k.startsWith('otDay-')){ try{ const p=JSON.parse(localStorage.getItem(k)); if(p.month===month) list.push(p); }catch{} }
+    }
+    // من السحابة
+    if(firebaseReady && auth.currentUser){
+      const ref = db.collection('users').doc(auth.currentUser.uid).collection('days');
+      const snap = await ref.where('month','==',month).get();
+      snap.forEach(doc=>{ const p=doc.data(); if(!list.find(x=>x.date===p.date)) list.push(p); });
+    }
+    list.sort((a,b)=> a.date < b.date ? -1 : 1);
+    // بناء جدول
+    let html = '<table class="table"><thead><tr><th>التاريخ</th><th>البداية</th><th>النهاية</th><th>استراحة</th><th>الصافي</th><th>إضافي</th></tr></thead><tbody>';
+    let total=0, daysCount=0; const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
+    list.forEach(p=>{ if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const br=parseInt(p.breakMin||0,10); const net=Math.max(0,(em-sm)-br); const ot=Math.max(0, net-baseDayMin); total+=net; daysCount++; html += `<tr><td>${p.date}</td><td>${p.start}</td><td>${p.end}</td><td>${p.breakMin}</td><td>${m2h(net)}</td><td>${m2h(ot)}</td></tr>`; } });
+    html += '</tbody></table>';
+    monthArea.innerHTML = html;
+    const otMonth = Math.max(0, total - (daysCount*baseDayMin));
+    mTotal.textContent = m2h(total); mOT.textContent = m2h(otMonth); mDays.textContent = String(daysCount); mAvg.textContent = daysCount? m2h(Math.round(total/daysCount)):'0:00';
+  } — ${end.toLocaleDateString('de-DE')}`;
     days.forEach(d=> cal.appendChild(buildDayCard(d, start)));
     // حمّل من السحابة/المحلي
     loadStateForWeek().then(()=> commit());
@@ -469,6 +602,14 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
   }
 
+  // ======= وضع يومي روابط =======
+  [dayStart, dayEnd, dayBreak].forEach(el=> el.addEventListener('input', computeDay));
+  dayDate.addEventListener('change', loadDay);
+  saveDayBtn.addEventListener('click', saveDay);
+  openMonthBtn.addEventListener('click', openMonthModal);
+  closeMonth.addEventListener('click', closeMonthModal);
+  refreshMonth.addEventListener('click', refreshMonthSummary);
+
   // ======= ربط الأحداث العامة =======
   [baselineDayEl, baselineWeekEl, defaultBreakEl].forEach(el=> el.addEventListener('input', commit));
   weekStartEl.addEventListener('change', renderWeek);
@@ -590,6 +731,10 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
   // Init — الإثنين الأقرب
   function initWeek(){ setMondayOnPicker(new Date()); renderWeek(); }
+  // ضبط الوضع الافتراضي: يومي + تاريخ اليوم + ثيم مريح
+  modeSelect.value='day'; dayCard.style.display='block'; weekCard.style.display='none';
+  document.body.classList.add('light'); themeBtn.textContent='ثيم داكن';
+  dayDate.value = new Date().toISOString().slice(0,10); loadDay();
   initWeek();
 })();
 </script><!-- ===== Firestore Security Rules (انسخها في قسم Rules) =====
