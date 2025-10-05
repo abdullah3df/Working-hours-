@@ -1,0 +1,380 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>حاسبة الساعات والإضافي | ألمانيا</title>
+  <style>
+    :root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --accent:#22c55e; --danger:#ef4444; --ok:#60a5fa; --text:#e5e7eb; }
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Naskh Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .wrap{max-width:980px;margin:24px auto;padding:16px}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:16px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+    h1{font-size:clamp(20px,3vw,28px);margin:0 0 8px}
+    h2{font-size:18px;margin:16px 0 8px;color:#cbd5e1}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{flex:1 1 200px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #233044;background:#0b1220;color:var(--text)}
+    input[type="time"], input[type="number"]{direction:ltr}
+    button{cursor:pointer;border:1px solid #2b394f}
+    .primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none}
+    .ghost{background:transparent}
+    .small{font-size:12px;color:var(--muted)}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th,td{padding:10px 12px;text-align:center}
+    thead th{font-size:12px;color:#93a4b9}
+    tbody tr{background:#0b1220;border:1px solid #202b40}
+    tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
+    tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1220;border:1px solid #1f2b40;color:#e5e7eb}
+    .tag.ok{border-color:#14532d}
+    .tag.warn{border-color:#7f1d1d}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:700px){ .grid2{grid-template-columns:1fr} }
+    .foot{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:8px}
+    .muted{color:var(--muted)}
+    .pill{padding:8px 12px;border-radius:999px;background:#0b1220;border:1px solid #26334a}
+    .kpi{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-top:10px}
+    .kpi .card-mini{background:#0b1220;border:1px solid #1f2b40;border-radius:12px;padding:12px;text-align:center}
+    .kpi h3{margin:0;font-size:14px;color:#cbd5e1}
+    .kpi .val{font-size:20px;font-weight:700;margin-top:6px}
+    .sep{height:1px;background:#1f2937;margin:16px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>حاسبة الساعات والإضافي (Überstunden) — ألمانيا</h1>
+      <p class="small">أدخل أوقاتك لكل يوم (الإفتراضي 5 أيام عمل). الحاسبة تخصم الاستراحة، وتحسب الساعات اليومية والأسبوعية، وتُظهر الإضافي فوق 40 ساعة/الأسبوع وفوق 8 ساعات/اليوم.</p><div class="grid2">
+    <div class="col">
+      <h2>الإعدادات الأساسية</h2>
+      <div class="row">
+        <div class="col">
+          <label>الأساس اليومي (ساعات)</label>
+          <input id="baselineDay" type="number" min="0" step="0.25" value="8">
+        </div>
+        <div class="col">
+          <label>الأساس الأسبوعي (ساعات)</label>
+          <input id="baselineWeek" type="number" min="0" step="0.5" value="40">
+        </div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div class="col">
+          <label>نمط الوقت</label>
+          <select id="timeMode">
+            <option value="de">24-ساعة (أوروبا/ألمانيا)</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>استراحة افتراضية (دقائق)</label>
+          <input id="defaultBreak" type="number" min="0" step="5" value="30">
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="row">
+        <div class="col">
+          <button class="ghost" id="fillExample">تعبئة مثال: 07:00 → 17:30</button>
+        </div>
+        <div class="col">
+          <button class="ghost" id="clearAll">مسح الكل</button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <h2>ملخص سريع</h2>
+      <div class="kpi">
+        <div class="card-mini"><h3>مجموع الأسبوع</h3><div class="val" id="kTotal">0:00</div></div>
+        <div class="card-mini"><h3>إضافي أسبوعي</h3><div class="val" id="kOTWeek">0:00</div></div>
+        <div class="card-mini"><h3>معدل اليوم</h3><div class="val" id="kAvg">0:00</div></div>
+        <div class="card-mini"><h3>أيام مُدخلة</h3><div class="val" id="kDays">0</div></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>أيام الأسبوع</h2>
+  <div class="foot">
+    <span class="muted">* السبت اختياري. يمكنك ترك أي يوم فارغ إذا لم تعمل.</span>
+    <span class="pill" id="weekInfo">الأساس الأسبوعي: 40:00</span>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>اليوم</th>
+          <th>البدء</th>
+          <th>الانتهاء</th>
+          <th>الاستراحة (د)</th>
+          <th>الصافي (س)</th>
+          <th>إضافي يومي</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <div class="row">
+    <div class="col">
+      <button class="primary" id="exportJson">تصدير الأسبوع (JSON)</button>
+    </div>
+    <div class="col">
+      <button class="ghost" id="importJson">استيراد أسبوع</button>
+      <input id="fileInput" type="file" accept="application/json" style="display:none" />
+    </div>
+  </div>
+
+</div>
+
+  </div><script>
+(function(){
+  const days = [
+    { key:'mon', label:'الاثنين' },
+    { key:'tue', label:'الثلاثاء' },
+    { key:'wed', label:'الأربعاء' },
+    { key:'thu', label:'الخميس' },
+    { key:'fri', label:'الجمعة' },
+    { key:'sat', label:'السبت (اختياري)' },
+  ];
+
+  const tbody = document.getElementById('tbody');
+  const baselineDayEl = document.getElementById('baselineDay');
+  const baselineWeekEl = document.getElementById('baselineWeek');
+  const defaultBreakEl = document.getElementById('defaultBreak');
+  const kTotal = document.getElementById('kTotal');
+  const kOTWeek = document.getElementById('kOTWeek');
+  const kAvg = document.getElementById('kAvg');
+  const kDays = document.getElementById('kDays');
+  const weekInfo = document.getElementById('weekInfo');
+
+  const fillExampleBtn = document.getElementById('fillExample');
+  const clearAllBtn = document.getElementById('clearAll');
+  const exportBtn = document.getElementById('exportJson');
+  const importBtn = document.getElementById('importJson');
+  const fileInput = document.getElementById('fileInput');
+
+  function h2m(h){
+    const [HH, MM] = h.split(':').map(Number);
+    return (HH*60 + (MM||0));
+  }
+  function m2h(m){
+    const sign = m < 0 ? '-' : '';
+    m = Math.abs(m);
+    const hh = Math.floor(m/60);
+    const mm = Math.round(m%60);
+    return `${sign}${hh}:${mm.toString().padStart(2,'0')}`;
+  }
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+  function buildRow(d){
+    const tr = document.createElement('tr');
+    tr.dataset.key = d.key;
+
+    const tdDay = document.createElement('td');
+    tdDay.textContent = d.label;
+
+    const tdStart = document.createElement('td');
+    const start = document.createElement('input');
+    start.type = 'time'; start.value = '';
+    start.placeholder = 'hh:mm';
+
+    const tdEnd = document.createElement('td');
+    const end = document.createElement('input');
+    end.type = 'time'; end.value = '';
+
+    const tdBreak = document.createElement('td');
+    const brk = document.createElement('input');
+    brk.type = 'number'; brk.min = 0; brk.step = 5; brk.value = defaultBreakEl.value;
+
+    const tdNet = document.createElement('td');
+    const net = document.createElement('span'); net.className = 'tag ok'; net.textContent = '0:00';
+
+    const tdOT = document.createElement('td');
+    const ot = document.createElement('span'); ot.className = 'tag'; ot.textContent = '0:00';
+
+    [start,end,brk].forEach(el=>el.addEventListener('input', commit));
+
+    tdStart.appendChild(start); tdEnd.appendChild(end); tdBreak.appendChild(brk);
+    tdNet.appendChild(net); tdOT.appendChild(ot);
+
+    tr.appendChild(tdDay); tr.appendChild(tdStart); tr.appendChild(tdEnd); tr.appendChild(tdBreak); tr.appendChild(tdNet); tr.appendChild(tdOT);
+
+    return tr;
+  }
+
+  function getRowData(tr){
+    const [start,end,brk] = [...tr.querySelectorAll('input')];
+    const has = start.value && end.value;
+    if(!has) return { minutes:0, ot:0, valid:false };
+
+    let s = h2m(start.value);
+    let e = h2m(end.value);
+
+    // دعم الشفتات التي تنتهي بعد منتصف الليل (مثلاً 22:00 → 05:00)
+    if(e < s) e += 24*60;
+
+    const breakMin = clamp(parseInt(brk.value||0,10),0,600);
+    const total = Math.max(0, (e - s) - breakMin);
+
+    const baseDay = Math.round(parseFloat(baselineDayEl.value||8)*60);
+    const ot = Math.max(0, total - baseDay);
+
+    return { minutes: total, ot, valid:true };
+  }
+
+  function commit(){
+    // حدث على أي تغيير
+    let totalWeek = 0; let daysCount = 0; let otWeek=0; const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
+
+    [...tbody.querySelectorAll('tr')].forEach(tr=>{
+      const data = getRowData(tr);
+      const net = tr.querySelector('td:nth-child(5) span');
+      const ot = tr.querySelector('td:nth-child(6) span');
+
+      net.textContent = m2h(data.minutes);
+      ot.textContent = m2h(data.ot);
+      ot.className = 'tag ' + (data.ot>0 ? 'warn' : 'ok');
+
+      if(data.valid){
+        totalWeek += data.minutes;
+        otWeek += data.ot;
+        daysCount += 1;
+      }
+    });
+
+    const baseWeekMin = Math.round(parseFloat(baselineWeekEl.value||40)*60);
+
+    kTotal.textContent = m2h(totalWeek);
+    const weekExtra = Math.max(0, totalWeek - baseWeekMin);
+    kOTWeek.textContent = m2h(weekExtra);
+    kAvg.textContent = daysCount? m2h(Math.round(totalWeek/daysCount)) : '0:00';
+    kDays.textContent = daysCount;
+
+    weekInfo.textContent = `الأساس الأسبوعي: ${m2h(baseWeekMin)}`;
+
+    // حفظ تلقائي بسيط في localStorage
+    saveState();
+  }
+
+  function saveState(){
+    const state = {
+      baselineDay: baselineDayEl.value,
+      baselineWeek: baselineWeekEl.value,
+      defaultBreak: defaultBreakEl.value,
+      rows: [...tbody.querySelectorAll('tr')].map(tr=>{
+        const [start,end,brk] = [...tr.querySelectorAll('input')];
+        return { day: tr.dataset.key, start:start.value, end:end.value, brk:brk.value };
+      })
+    };
+    localStorage.setItem('otState', JSON.stringify(state));
+  }
+
+  function loadState(){
+    const raw = localStorage.getItem('otState');
+    if(!raw) return;
+    try{
+      const s = JSON.parse(raw);
+      baselineDayEl.value = s.baselineDay ?? 8;
+      baselineWeekEl.value = s.baselineWeek ?? 40;
+      defaultBreakEl.value = s.defaultBreak ?? 30;
+      const map = new Map((s.rows||[]).map(r=>[r.day,r]));
+      [...tbody.querySelectorAll('tr')].forEach(tr=>{
+        const r = map.get(tr.dataset.key);
+        if(r){
+          const [start,end,brk] = [...tr.querySelectorAll('input')];
+          start.value = r.start || '';
+          end.value = r.end || '';
+          brk.value = r.brk ?? defaultBreakEl.value;
+        }
+      });
+    }catch(e){ console.warn('Failed to load state', e); }
+  }
+
+  function exportJSON(){
+    const data = {
+      meta: { app:"OT-Calc-DE", version:1, exportedAt: new Date().toISOString() },
+      baseline: { day: baselineDayEl.value, week: baselineWeekEl.value },
+      days: [...tbody.querySelectorAll('tr')].map(tr=>{
+        const [start,end,brk] = [...tr.querySelectorAll('input')];
+        const d = getRowData(tr);
+        return { key: tr.dataset.key, start:start.value, end:end.value, breakMinutes: brk.value, net: m2h(d.minutes), dailyOT: m2h(d.ot) };
+      })
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'week-ot.json'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSONFile(file){
+    const fr = new FileReader();
+    fr.onload = ()=>{
+      try{
+        const data = JSON.parse(fr.result);
+        if(data.baseline){
+          baselineDayEl.value = data.baseline.day ?? 8;
+          baselineWeekEl.value = data.baseline.week ?? 40;
+        }
+        const map = new Map((data.days||[]).map(r=>[r.key,r]));
+        [...tbody.querySelectorAll('tr')].forEach(tr=>{
+          const r = map.get(tr.dataset.key);
+          if(r){
+            const [start,end,brk] = [...tr.querySelectorAll('input')];
+            start.value = r.start || '';
+            end.value = r.end || '';
+            brk.value = r.breakMinutes ?? defaultBreakEl.value;
+          }
+        });
+        commit();
+      }catch(e){ alert('ملف غير صالح'); }
+    };
+    fr.readAsText(file);
+  }
+
+  // Build table
+  days.forEach(d=> tbody.appendChild(buildRow(d)) );
+
+  // Listeners
+  [baselineDayEl, baselineWeekEl, defaultBreakEl].forEach(el=> el.addEventListener('input', ()=>{
+    // تحديث الاستراحة الافتراضية لا يُغير المُدخلات الحالية تلقائياً
+    commit();
+  }));
+
+  fillExampleBtn.addEventListener('click', ()=>{
+    const ex = [
+      {k:'mon', s:'07:00', e:'17:30', b:30},
+      {k:'tue', s:'07:00', e:'17:00', b:30},
+      {k:'wed', s:'07:00', e:'16:00', b:30},
+      {k:'thu', s:'07:30', e:'15:30', b:30},
+      {k:'fri', s:'06:00', e:'14:30', b:30},
+      {k:'sat', s:'', e:'', b:30},
+    ];
+    ex.forEach(r=>{
+      const tr = [...tbody.querySelectorAll('tr')].find(x=>x.dataset.key===r.k);
+      if(tr){
+        const [start,end,brk] = [...tr.querySelectorAll('input')];
+        start.value = r.s; end.value = r.e; brk.value = r.b;
+      }
+    });
+    commit();
+  });
+
+  clearAllBtn.addEventListener('click', ()=>{
+    [...tbody.querySelectorAll('tr')].forEach(tr=>{
+      const [start,end,brk] = [...tr.querySelectorAll('input')];
+      start.value = ''; end.value = ''; brk.value = defaultBreakEl.value;
+    });
+    commit();
+  });
+
+  exportBtn.addEventListener('click', exportJSON);
+  importBtn.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', ()=>{
+    if(fileInput.files && fileInput.files[0]) importJSONFile(fileInput.files[0]);
+  });
+
+  // Initialize
+  loadState();
+  commit();
+})();
+</script></body>
+</html>
