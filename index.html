@@ -84,10 +84,11 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
     <div class="inner">
       <div class="brand">⏱️ ساعاتي</div>
       <button id="themeBtn" class="btn-sm" title="تبديل الثيم">ثيم مريح</button>
-      <select id="modeSelect" class="btn-sm" title="وضع الإدخال">
-        <option value="day">يومي</option>
-        <option value="week">أسبوعي</option>
-      </select>
+      <div class="spacer"></div>
+      <button id="navDay" class="btn-sm" title="يومي">يومي</button>
+      <button id="navWeek" class="btn-sm" title="أسبوعي">أسبوعي</button>
+      <button id="navMonth" class="btn-sm" title="شهري">شهري</button>
+      <button id="navExport" class="btn-sm" title="تصدير">تصدير</button>
       <div class="spacer"></div>
       <div id="userArea" class="dropdown">
         <button id="userBtn" class="btn-sm">تسجيل الدخول</button>
@@ -118,6 +119,32 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       </div>
       <div class="sep"></div>
       <p class="small">إذا لم تضع إعدادات Firebase سيعمل الموقع محليًا فقط (localStorage) بدون خادم.</p>
+    </div>
+  </div>  <!-- نافذة التصدير العامة -->  <div id="exportModal" class="modal" aria-hidden="true">
+    <div class="dialog" style="max-width:520px">
+      <h2>تصدير البيانات</h2>
+      <p class="small">اختر النطاق والصيغة. يعمل في أي وقت.</p>
+      <div class="row">
+        <div class="col">
+          <label>النطاق</label>
+          <select id="expScope">
+            <option value="day">اليوم الحالي</option>
+            <option value="week">الأسبوع الحالي</option>
+            <option value="month">الشهر المختار</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>الصيغة</label>
+          <select id="expFormat">
+            <option value="pdf">PDF</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-sm" id="closeExport">إلغاء</button>
+        <button class="btn-sm primary" id="doExport">تصدير</button>
+      </div>
     </div>
   </div>  <!-- لوحة الأسابيع (Dashboard) -->  <div id=\"dashModal\" class=\"modal\" aria-hidden=\"true\">
     <div class=\"dialog\" style=\"max-width:860px\">
@@ -285,6 +312,14 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   const avatar = document.getElementById('avatar');
   const authModal = document.getElementById('authModal');
   // ==== ثيم ووضع الإدخال ====
+  const openExportModal = ()=>{ exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false'); };
+  const closeExportModal = ()=>{ exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); };
+  closeExport.addEventListener('click', closeExportModal);
+  navDay.addEventListener('click', ()=>{ dayCard.style.display='block'; weekCard.style.display='none'; });
+  navWeek.addEventListener('click', ()=>{ dayCard.style.display='none'; weekCard.style.display='block'; });
+  navMonth.addEventListener('click', ()=> openMonthModal());
+  navExport.addEventListener('click', ()=> openExportModal());
+  themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
   themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
   modeSelect.addEventListener('change', ()=>{ const m=modeSelect.value; dayCard.style.display = m==='day'? 'block':'none'; weekCard.style.display = m==='week'? 'block':'none'; });
   const uName = document.getElementById('uName');
@@ -294,6 +329,16 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
   const doSignIn = document.getElementById('doSignIn');
   const doSignUp = document.getElementById('doSignUp');
   const menuProfile = document.getElementById('menuProfile');
+  const navDay = document.getElementById('navDay');
+  const navWeek = document.getElementById('navWeek');
+  const navMonth = document.getElementById('navMonth');
+  const navExport = document.getElementById('navExport');
+  const exportModal = document.getElementById('exportModal');
+  const expScope = document.getElementById('expScope');
+  const expFormat = document.getElementById('expFormat');
+  const closeExport = document.getElementById('closeExport');
+  const doExport = document.getElementById('doExport');
+  const menuLogout = document.getElementById('menuLogout');
   const menuLogout = document.getElementById('menuLogout');
   const menuDashboard = document.getElementById('menuDashboard');
   const menuVerify = document.getElementById('menuVerify');
@@ -724,6 +769,69 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
       doc.save(`week-${id}.pdf`);
     }catch(e){ alert('تعذّر إنشاء PDF: '+e.message); }
   }
+
+  // ======= تصدير: يوم/أسبوع/شهر =======
+  function buildDayPayload(){
+    return { date: dayKey(), start: dayStart.value, end: dayEnd.value, breakMin: dayBreak.value, baselineDay: baselineDayEl.value };
+  }
+  function exportDayJSON(){
+    const data = { meta:{ app:'Saaati', scope:'day', date:dayKey(), exportedAt:new Date().toISOString() }, payload: buildDayPayload() };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`day-${dayKey()}.json`; a.click(); URL.revokeObjectURL(url);
+  }
+  function exportDayPDF(){
+    try{ const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit:'pt', format:'a4' }); const pad=40; let y=pad; const p=buildDayPayload(); const sum=computeDay();
+      doc.setFontSize(16); doc.text('تقرير يوم العمل — '+p.date, pad, y); y+=26; doc.setFontSize(12);
+      doc.text(`البداية: ${p.start} — النهاية: ${p.end} — استراحة: ${p.breakMin}د`, pad, y); y+=18;
+      doc.text(`الصافي: ${m2h(sum.min)} — الإضافي: ${m2h(sum.ot)} — أساس اليوم: ${p.baselineDay}س`, pad, y);
+      doc.save(`day-${p.date}.pdf`);
+    }catch(e){ alert('تعذّر إنشاء PDF لليوم: '+e.message); }
+  }
+  function exportMonthJSON(){
+    const month = monthPick.value || monthKeyFromDateStr(new Date().toISOString());
+    // اجمع قائمة الشهر من الملخص الحالي إذا كان معروضًا، أو استدعِ التحديث
+    const table = monthArea.querySelector('table');
+    if(!table){ /* لا شيء */ }
+    // لإيجاز: نجمع من المحلي + السحابة مثل refreshMonthSummary
+    // سنستخدم نفس الوظيفة لجلب القائمة ثم نصدر
+  }
+
+  doExport.addEventListener('click', async()=>{
+    const scope = expScope.value; const fmt = expFormat.value;
+    try{
+      if(scope==='day'){
+        if(fmt==='json') exportDayJSON(); else exportDayPDF();
+      } else if(scope==='week'){
+        // استخدم الدوال الموجودة للأسبوع
+        const payload = pickWeekPayload();
+        if(fmt==='json') exportJSON(); else downloadWeekPDF(weekKey(), payload);
+      } else if(scope==='month'){
+        // نعيد استخدام توليد الملخص ثم نصنع PDF/JSON سريعًا من DOM
+        await refreshMonthSummary();
+        const month = monthPick.value || monthKeyFromDateStr(new Date().toISOString());
+        if(fmt==='json'){
+          // استخراج صفوف الجدول
+          const rows = [...monthArea.querySelectorAll('tbody tr')].map(tr=>{
+            const tds=[...tr.children].map(td=>td.textContent.trim());
+            return {date:tds[0], start:tds[1], end:tds[2], breakMin:tds[3], net:tds[4], ot:tds[5]};
+          });
+          const data = { meta:{ app:'Saaati', scope:'month', month, exportedAt:new Date().toISOString() }, rows, totals:{ total:mTotal.textContent, ot:mOT.textContent, days:mDays.textContent, avg:mAvg.textContent } };
+          const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+          const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);
+        } else {
+          const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pad=40; let y=pad; doc.setFontSize(16); doc.text('تقرير الشهر — '+month, pad, y); y+=26; doc.setFontSize(11);
+          // رؤوس
+          const head=['التاريخ','البداية','النهاية','استراحة','الصافي','الإضافي'];
+          doc.text(head.join(' | '), pad, y); y+=16;
+          [...monthArea.querySelectorAll('tbody tr')].forEach(tr=>{ const line=[...tr.children].map(td=>td.textContent.trim()).join(' | '); doc.text(line, pad, y); y+=14; if(y>760){ doc.addPage(); y=pad; }
+          });
+          y+=10; doc.text(`الإجمالي: ${mTotal.textContent} — الإضافي: ${mOT.textContent} — الأيام: ${mDays.textContent} — المعدل: ${mAvg.textContent}`, pad, y);
+          doc.save(`month-${month}.pdf`);
+        }
+      }
+      closeExportModal();
+    }catch(e){ alert('تعذر التصدير: '+e.message); }
+  });
       inputs[0].value=''; inputs[1].value=''; inputs[2].value=defaultBreakEl.value;
     });
     commit();
