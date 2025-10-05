@@ -1,49 +1,95 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ساعاتي — حاسبة الدوام اليومية</title>
-  <style>
-    :root{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
-    .light{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,sans-serif}/* الشريط العلوي */
-.topbar{position:sticky;top:0;z-index:20;background:#0c1426;border-bottom:1px solid #1f2b40}
-.topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ساعاتي — حاسبة الدوام اليومية</title>
+<style>
+:root{
+  --bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;
+  --line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa
+}
+.light{
+  --bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;
+  --line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,"Noto Naskh Arabic",Tahoma,sans-serif
+}
+
+/* الشريط العلوي */
+.topbar{
+  position:sticky;top:0;z-index:20;background:#0c1426;
+  border-bottom:1px solid #1f2b40
+}
+.topbar .inner{
+  max-width:1060px;margin:0 auto;padding:10px 12px;
+  display:flex;gap:8px;align-items:center;
+  flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none
+}
 .topbar .inner::-webkit-scrollbar{display:none}
 .brand{font-weight:800;flex-shrink:0}
-.btn-sm{padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;background:#0a1222;color:#e5e7eb;cursor:pointer;flex-shrink:0;white-space:nowrap;height:36px}
+.btn-sm{
+  padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;
+  background:#0a1222;color:#e5e7eb;cursor:pointer;flex-shrink:0;
+  white-space:nowrap;height:36px
+}
 .light .btn-sm{background:#fff;color:#0f172a;border-color:#e2e8f0}
 #themeBtn{order:99}
 
+/* الحاوية/البطاقة */
 .wrap{max-width:860px;margin:24px auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 26px rgba(0,0,0,.25)}
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px;box-shadow:0 8px 26px rgba(0,0,0,.25)
+}
 h1{margin:0 0 8px;font-size:22px}
 p.small{color:var(--muted);margin:0 0 12px}
 
-/* شبكة الوقت الجديدة */
-.date-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.date-row .pill{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#0a1222;color:var(--ink);font-size:13px}
-.light .date-row .pill{background:#fff;border-color:#e2e8f0;color:#0f172a}
+/* صف التاريخ المحسّن */
+.date-row{
+  display:grid;grid-template-columns:1fr auto;gap:10px;
+  align-items:end; /* يُحاذي الحبة مع أسفل مدخل التاريخ */
+  margin-bottom:8px
+}
+.date-input label{display:block;color:var(--muted);font-size:13px;margin:0 0 4px}
+.date-input input{
+  width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);
+  background:#0a1222;color:var(--ink);direction:ltr;text-align:center;font-weight:700
+}
+.light .date-input input{background:#fff;color:#0f172a;border-color:#e2e8f0}
+.pill{
+  align-self:end;padding:8px 14px;border-radius:999px;border:1px solid var(--line);
+  background:#0a1222;color:var(--ink);font-size:13px;font-weight:700;
+  min-width:100px;text-align:center
+}
+.light .pill{background:#fff;border-color:#e2e8f0;color:#0f172a}
 
-label{display:block;color:var(--muted);font-size:13px;margin:4px 0}
-input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink)}
-input[type="time"],input[type="date"],input[type="number"]{direction:ltr;text-align:center;font-weight:700}
-.light input,.light select{background:#fff;color:#0f172a;border-color:#e2e8f0}
-
-.time-grid{display:grid;grid-template-columns:1fr 1fr 120px;gap:12px;margin-top:10px}
-@media (max-width:560px){.time-grid{grid-template-columns:1fr 1fr;}.break-col{grid-column:span 2;justify-self:end;max-width:180px;width:100%}}
-
-.time-box{border:1px solid var(--line);background:#0a1222;border-radius:16px;padding:12px}
+/* شبكة الوقت */
+.time-grid{display:grid;grid-template-columns:1fr 1fr 130px;gap:12px}
+@media (max-width:560px){
+  .time-grid{grid-template-columns:1fr 1fr}
+  .break-col{grid-column:span 2;justify-self:end;max-width:200px;width:100%}
+}
+.time-box{
+  border:1px solid var(--line);background:#0a1222;border-radius:16px;padding:12px
+}
 .light .time-box{background:#fff;border-color:#e2e8f0}
 .time-box .title{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px}
-.ico{font-size:16px}
 .start .title{color:var(--ok)}
-.end .title{color:var(--warn)}
+.end   .title{color:var(--warn)}
+.time-box input{
+  width:100%;height:44px;padding:10px;border-radius:12px;border:1px solid var(--line);
+  background:#0a1222;color:var(--ink);direction:ltr;text-align:center;font-weight:700
+}
+.light .time-box input{background:#fff;color:#0f172a;border-color:#e2e8f0}
 .start input{border-color:#14532d;background:rgba(22,163,74,.08)}
-.end input{border-color:#7f1d1d;background:rgba(239,68,68,.08)}
+.end   input{border-color:#7f1d1d;background:rgba(239,68,68,.08)}
 .light .start input{background:#ecfdf5}
-.light .end input{background:#fef2f2}
+.light .end   input{background:#fef2f2}
 
 /* بطاقات المؤشرات */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
@@ -52,103 +98,130 @@ input[type="time"],input[type="date"],input[type="number"]{direction:ltr;text-al
 .kcard h3{margin:0;color:var(--muted);font-size:13px}
 .kcard .val{font-size:20px;font-weight:800;margin-top:4px}
 
-.primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none;color:#fff;cursor:pointer;border-radius:12px;padding:12px;width:100%}
-
-  </style>
+/* زر الحفظ */
+.primary{
+  background:linear-gradient(180deg,#16a34a,#15803d);border:none;color:#fff;
+  cursor:pointer;border-radius:12px;padding:12px;width:100%;font-size:15px
+}
+</style>
 </head>
 <body class="light">
-  <div class="topbar">
-    <div class="inner">
-      <div class="brand">⏱️ ساعاتي</div>
-      <button id="navHome" class="btn-sm">الرئيسية</button>
-      <button id="navDay" class="btn-sm">اليوم</button>
-      <button id="navMonth" class="btn-sm">الشهري</button>
-      <button id="navSettings" class="btn-sm">الإعدادات</button>
-      <button id="navExport" class="btn-sm">تصدير</button>
-      <button id="themeBtn" class="btn-sm">ثيم داكن 🌙</button>
-    </div>
-  </div>  <div class="wrap">
-    <div class="card" id="dayCard">
-      <h1>الإدخال اليومي</h1>
-      <p class="small">أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.
-      </p><div class="date-row" style="margin-bottom:8px">
-    <div style="flex:1;min-width:220px">
-      <label>تاريخ</label>
-      <input type="date" id="dayDate" />
-    </div>
-    <div class="pill" id="dayName">—</div>
-  </div>
 
-  <div class="time-grid">
-    <div class="time-box start">
-      <div class="title"><span class="ico">🟢</span><span>دخول</span></div>
-      <input type="time" id="dayStart" />
-    </div>
-    <div class="time-box end">
-      <div class="title"><span class="ico">🔴</span><span>خروج</span></div>
-      <input type="time" id="dayEnd" />
-    </div>
-    <div class="time-box break-col">
-      <div class="title"><span class="ico">☕️</span><span>استراحة (دقيقة)</span></div>
-      <input type="number" id="dayBreak" value="30" min="0" step="5" />
-    </div>
+<!-- الشريط -->
+<div class="topbar">
+  <div class="inner">
+    <div class="brand">⏱️ ساعاتي</div>
+    <button class="btn-sm">الرئيسية</button>
+    <button class="btn-sm">اليوم</button>
+    <button class="btn-sm">الشهري</button>
+    <button class="btn-sm">الإعدادات</button>
+    <button class="btn-sm">تصدير</button>
+    <button id="themeBtn" class="btn-sm">ثيم داكن 🌙</button>
   </div>
-
-  <div class="kpis">
-    <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
-    <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
-    <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
-    <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
-  </div>
-
-  <button id="saveDay" class="primary" style="margin-top:12px">💾 حفظ اليوم</button>
 </div>
 
-  </div>  <script>
-    // عناصر
-    const themeBtn=document.getElementById('themeBtn');
-    const dayDate=document.getElementById('dayDate');
-    const dayStart=document.getElementById('dayStart');
-    const dayEnd=document.getElementById('dayEnd');
-    const dayBreak=document.getElementById('dayBreak');
-    const dNet=document.getElementById('dNet');
-    const dOT=document.getElementById('dOT');
-    const dBase=document.getElementById('dBase');
-    const dSave=document.getElementById('dSave');
-    const dayName=document.getElementById('dayName');
-    const saveBtn=document.getElementById('saveDay');
+<div class="wrap">
+  <div class="card" id="dayCard">
+    <h1>الإدخال اليومي</h1>
+    <p class="small">أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.</p>
 
-    // ثيم
-    themeBtn.onclick=()=>{document.body.classList.toggle('light');themeBtn.textContent=document.body.classList.contains('light')?'ثيم داكن 🌙':'ثيم مريح ☀️'};
+    <!-- التاريخ + اسم اليوم (محاذاة مثالية) -->
+    <div class="date-row">
+      <div class="date-input">
+        <label>تاريخ</label>
+        <input id="dayDate" type="date" />
+      </div>
+      <div class="pill" id="dayName">—</div>
+    </div>
 
-    // أدوات وقت
-    function h2m(h){if(!h)return 0;const [H,M]=h.split(':').map(Number);return H*60+(M||0)}
-    function m2h(m){const hh=Math.floor(m/60),mm=Math.round(m%60);return `${hh}:${String(mm).padStart(2,'0')}`}
-    function arDayName(d){return ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][d.getDay()]}
+    <!-- مربعات الوقت -->
+    <div class="time-grid">
+      <div class="time-box start">
+        <div class="title">🟢 دخول</div>
+        <input id="dayStart" type="time" />
+      </div>
+      <div class="time-box end">
+        <div class="title">🔴 خروج</div>
+        <input id="dayEnd" type="time" />
+      </div>
+      <div class="time-box break-col">
+        <div class="title">☕️ استراحة (دقيقة)</div>
+        <input id="dayBreak" type="number" min="0" step="5" value="30" />
+      </div>
+    </div>
 
-    function updateDayName(){try{const d=new Date(dayDate.value);dayName.textContent=arDayName(d)||'—';}catch{dayName.textContent='—'}}
+    <!-- المؤشرات -->
+    <div class="kpis">
+      <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
+      <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
+      <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
+      <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
+    </div>
 
-    // حساب اليوم
-    function compute(){
-      const s=dayStart.value,e=dayEnd.value,br=parseInt(dayBreak.value||0,10);
-      if(!s||!e){dNet.textContent='0:00';dOT.textContent='0:00';return}
-      let sm=h2m(s),em=h2m(e);if(em<sm)em+=1440;
-      const base=8*60;const net=Math.max(0,(em-sm)-br);const ot=Math.max(0,net-base);
-      dNet.textContent=m2h(net);dOT.textContent=m2h(ot);dBase.textContent='8';
-    }
+    <button id="saveDay" class="primary" style="margin-top:12px">💾 حفظ اليوم</button>
+  </div>
+</div>
 
-    // تخزين محلي
-    function save(){const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)};localStorage.setItem('day-'+p.date,JSON.stringify(p));dSave.textContent='تم الحفظ ✅';setTimeout(()=>dSave.textContent='—',1600)}
-    function load(){const raw=localStorage.getItem('day-'+dayDate.value);if(raw){try{const p=JSON.parse(raw);dayStart.value=p.start||'';dayEnd.value=p.end||'';dayBreak.value=p.break??30;}catch{}}compute()}
+<script>
+/* عناصر */
+const themeBtn = document.getElementById('themeBtn');
+const dayDate  = document.getElementById('dayDate');
+const dayStart = document.getElementById('dayStart');
+const dayEnd   = document.getElementById('dayEnd');
+const dayBreak = document.getElementById('dayBreak');
+const dNet     = document.getElementById('dNet');
+const dOT      = document.getElementById('dOT');
+const dBase    = document.getElementById('dBase');
+const dSave    = document.getElementById('dSave');
+const dayName  = document.getElementById('dayName');
+const saveBtn  = document.getElementById('saveDay');
 
-    // روابط
-    [dayStart,dayEnd,dayBreak].forEach(el=>el.addEventListener('input',compute));
-    dayDate.addEventListener('change',()=>{updateDayName();load()});
-    saveBtn.addEventListener('click',save);
+/* ثيم */
+themeBtn.onclick=()=>{
+  document.body.classList.toggle('light');
+  themeBtn.textContent = document.body.classList.contains('light') ? 'ثيم داكن 🌙' : 'ثيم مريح ☀️';
+};
 
-    // تهيئة
-    dayDate.value=new Date().toISOString().slice(0,10);
-    updateDayName();
-    load();
-  </script></body>
+/* أدوات وقت */
+function h2m(h){ if(!h) return 0; const [H,M]=h.split(':').map(Number); return H*60+(M||0); }
+function m2h(m){ const hh=Math.floor(m/60), mm=Math.round(m%60); return `${hh}:${String(mm).padStart(2,'0')}`; }
+function arDayName(d){ return ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'][d.getDay()]; }
+function updateDayName(){ try{ const d=new Date(dayDate.value); dayName.textContent = arDayName(d) || '—'; } catch{ dayName.textContent='—'; } }
+
+/* حساب اليوم */
+function compute(){
+  const s=dayStart.value, e=dayEnd.value, br=parseInt(dayBreak.value||0,10);
+  if(!s || !e){ dNet.textContent='0:00'; dOT.textContent='0:00'; return; }
+  let sm=h2m(s), em=h2m(e); if(em<sm) em += 1440; // عبور منتصف الليل
+  const base=8*60;
+  const net=Math.max(0,(em-sm)-br);
+  const ot =Math.max(0,net-base);
+  dNet.textContent=m2h(net);
+  dOT.textContent=m2h(ot);
+  dBase.textContent='8';
+}
+
+/* حفظ/تحميل محلي */
+function save(){
+  const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)};
+  localStorage.setItem('day-'+p.date, JSON.stringify(p));
+  dSave.textContent='تم الحفظ ✅'; setTimeout(()=> dSave.textContent='—',1600);
+}
+function load(){
+  const raw=localStorage.getItem('day-'+dayDate.value);
+  if(raw){ try{ const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=(p.break??30); }catch{} }
+  compute();
+}
+
+/* روابط */
+[dayStart,dayEnd,dayBreak].forEach(el=> el.addEventListener('input', compute));
+dayDate.addEventListener('change', ()=>{ updateDayName(); load(); });
+saveBtn.addEventListener('click', save);
+
+/* تهيئة أولية */
+dayDate.value = new Date().toISOString().slice(0,10);
+updateDayName();
+load();
+</script>
+</body>
 </html>
