@@ -2,13 +2,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ساعاتي — حاسبة الدوام والإضافي مع حسابات</title>
+  <title>ساعاتي — إدخال يومي + عدادات أسبوع/شهر + تصدير</title>
   <style>
     :root{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
-    /* ثيم فاتح مريح للعين */
     .light{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .topbar{position:sticky;top:0;z-index:10;background:#0c1426;border-bottom:1px solid #1f2b40}
+    .topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:10px;align-items:center}
+    .brand{font-weight:800}
+    .nav{display:flex;gap:8px;align-items:center}
+    .spacer{flex:1}
+    .btn-sm{padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;background:#0a1222;color:#e5e7eb;cursor:pointer}
+    .btn-sm.primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none}
     .wrap{max-width:1060px;margin:24px auto;padding:16px 12px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
     h1{margin:0 0 8px;font-size:clamp(20px,3vw,28px)}
@@ -17,119 +24,120 @@
     .col{flex:1 1 220px;min-width:0}
     label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
     input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink);min-width:0}
-    input[type="time"], input[type="date"], input[type="number"], input[type="email"], input[type="password"]{direction:ltr}
-    button{cursor:pointer}
-    .primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none}
-    .ghost{background:transparent}
-    .muted{color:var(--muted)}/* شريط علوي وحساب */
-.topbar{position:sticky;top:0;z-index:10;background:#0c1426;border-bottom:1px solid #1f2b40}
-.topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:12px;align-items:center}
-.brand{font-weight:800}
-.spacer{flex:1}
-.avatar{width:32px;height:32px;border-radius:999px;background:#23314a;display:flex;align-items:center;justify-content:center;font-weight:700;min-width:32px}
-.btn-sm{padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;background:#0a1222;color:#e5e7eb;cursor:pointer}
-.dropdown{position:relative}
-.menu{position:absolute;right:0;top:120%;background:#0a1222;border:1px solid #2a3a55;border-radius:12px;min-width:240px;display:none}
-.menu.open{display:block}
-.menu a{display:block;padding:10px 12px;color:#e5e7eb;text-decoration:none;border-bottom:1px solid #1f2b40}
-.menu a:last-child{border-bottom:none}
-
-/* حوار */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
-.modal.open{display:flex}
-.dialog{background:#0e1528;border:1px solid #1f2b40;border-radius:16px;max-width:520px;width:100%;padding:16px;max-height:85vh;overflow:auto}
-.dialog h2{margin:0 0 10px;font-size:18px}
-.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-.err{color:#fecaca;font-size:12px}
-
-/* تقويم أسبوعي */
-.weekbar{display:flex;align-items:center;gap:8px;margin:8px 0 12px;flex-wrap:wrap}
-.btn{padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink)}
-.btn:disabled{opacity:.6}
-.pill{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#0a1222}
-
-.calendar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;overflow:hidden}
-
-
-
-.day{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);background:#0a1222;border-radius:14px;padding:12px;min-width:0}
-.dayHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0}
-.title{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{font-size:12px;color:var(--muted);border:1px dashed var(--line);padding:4px 8px;border-radius:10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media (max-width:640px){.grid{grid-template-columns:1fr}}
-.kpi{display:flex;flex-wrap:wrap;gap:8px}
-.tag{font-size:12px;border:1px solid var(--line);padding:6px 10px;border-radius:999px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tag.ok{border-color:#14532d}
-.tag.warn{border-color:#7f1d1d}
-
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:8px}
-
-
-.kcard{border:1px solid var(--line);background:#0a1222;border-radius:12px;padding:12px;text-align:center}
-.kcard h3{margin:0;color:var(--muted);font-size:12px}
-.kcard .val{font-size:20px;font-weight:700;margin-top:6px}
-.sep{height:1px;background:var(--line);margin:14px 0}
-  .table{width:100%;border-collapse:separate;border-spacing:0 8px}
-th,td{padding:10px 12px;text-align:center}
-thead th{font-size:12px;color:#93a4b9}
-tbody tr{background:#0a1222;border:1px solid #1f2b40}
-tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
-tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
-
+    input[type="time"], input[type="date"], input[type="number"]{direction:ltr}
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:8px}
+    .kcard{border:1px solid var(--line);background:#0a1222;border-radius:12px;padding:12px;text-align:center}
+    .kcard h3{margin:0;color:var(--muted);font-size:12px}
+    .kcard .val{font-size:20px;font-weight:700;margin-top:6px}
+    .sep{height:1px;background:var(--line);margin:14px 0}
+    .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th,td{padding:10px 12px;text-align:center}
+    thead th{font-size:12px;color:#93a4b9}
+    tbody tr{background:#0a1222;border:1px solid #1f2b40}
+    tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
+    tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal.open{display:flex}
+    .dialog{background:#0e1528;border:1px solid #1f2b40;border-radius:16px;max-width:860px;width:100%;padding:16px;max-height:85vh;overflow:auto}
+    .dialog h2{margin:0 0 10px;font-size:18px}
+    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
   </style>
 </head>
-<body>
+<body class="light">
   <div class="topbar">
     <div class="inner">
       <div class="brand">⏱️ ساعاتي</div>
-      <button id="themeBtn" class="btn-sm" title="تبديل الثيم">ثيم مريح</button>
-      <div class="spacer"></div>
-      <button id="navDay" class="btn-sm" title="يومي">يومي</button>
-      <button id="navWeek" class="btn-sm" title="أسبوعي">أسبوعي</button>
-      <button id="navMonth" class="btn-sm" title="شهري">شهري</button>
-      <button id="navExport" class="btn-sm" title="تصدير">تصدير</button>
-      <div class="spacer"></div>
-      <div id="userArea" class="dropdown">
-        <button id="userBtn" class="btn-sm">تسجيل الدخول</button>
-        <div id=\"userMenu\" class=\"menu\">
-          <a href=\"#\" id=\"menuDashboard\">لوحة الأسابيع</a>
-          <a href=\"#\" id=\"menuVerify\">تأكيد البريد</a>
-          <a href=\"#\" id=\"menuReset\">إعادة تعيين كلمة السر</a>
-          <a href=\"#\" id=\"menuProfile\">الملف الشخصي</a>
-          <a href=\"#\" id=\"menuLogout\">تسجيل الخروج</a>
-        </div>
+      <div class="nav">
+        <button id="navWelcome" class="btn-sm">الرئيسية</button>
+        <button id="navDay" class="btn-sm">اليوم</button>
+        <button id="navMonth" class="btn-sm">الشهري</button>
+        <button id="navSettings" class="btn-sm">الإعدادات</button>
+        <button id="navExport" class="btn-sm">تصدير</button>
       </div>
-      <div id="avatar" class="avatar" title="المستخدم" style="display:none">?</div>
+      <div class="spacer"></div>
+      <button id="themeBtn" class="btn-sm">ثيم داكن</button>
     </div>
-  </div>  <div id="authModal" class="modal" aria-hidden="true">
+  </div>  <div class="wrap">
+    <!-- صفحة ترحيب بدون تسجيل دخول -->
+    <div class="card" id="welcomeCard">
+      <h1>أهلًا بك في <strong>ساعاتي</strong></h1>
+      <p class="small">ابدأ بتسجيل ساعات يومك مباشرة. لا تحتاج لتسجيل دخول.</p>
+      <div class="row" style="margin-top:8px">
+        <div class="col"><button class="btn-sm primary" id="welcomeStart">ابدأ الآن</button></div>
+        <div class="col"><button class="btn-sm" id="welcomeSettings">الإعدادات أولًا</button></div>
+      </div>
+    </div><!-- إدخال يومي فقط -->
+<div class="card" id="dayCard" style="display:none">
+  <h1>الإدخال اليومي</h1>
+  <p class="small">اختر التاريخ وأدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.</p>
+  <div class="row">
+    <div class="col"><label>تاريخ</label><input type="date" id="dayDate"></div>
+    <div class="col"><label>بداية</label><input type="time" id="dayStart"></div>
+    <div class="col"><label>نهاية</label><input type="time" id="dayEnd"></div>
+    <div class="col"><label>استراحة (دقيقة)</label><input type="number" id="dayBreak" min="0" step="5" value="30"></div>
+  </div>
+  <div class="kpis" style="margin-top:12px">
+    <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
+    <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
+    <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
+    <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
+  </div>
+
+  <div class="sep"></div>
+  <h2 style="margin:0 0 8px;font-size:18px">عدادات حيّة</h2>
+  <div class="kpis">
+    <div class="kcard"><h3>مجموع الأسبوع (حتى اليوم)</h3><div class="val" id="wTotal">0:00</div></div>
+    <div class="kcard"><h3>مقابل الهدف الأسبوعي</h3><div class="val" id="wDelta">0:00</div></div>
+    <div class="kcard"><h3>مجموع الشهر (حتى اليوم)</h3><div class="val" id="moTotal">0:00</div></div>
+    <div class="kcard"><h3>مقابل الهدف الشهري</h3><div class="val" id="moDelta">0:00</div></div>
+  </div>
+
+  <div class="row" style="margin-top:12px">
+    <div class="col"><button class="btn-sm primary" id="saveDay">حفظ اليوم</button></div>
+    <div class="col"><button class="btn-sm" id="openMonth">ملخص شهر</button></div>
+  </div>
+</div>
+
+<!-- الإعدادات -->
+<div class="card" id="settingsCard" style="display:none">
+  <h1>الإعدادات</h1>
+  <p class="small">عدّل الأساس اليومي/الأسبوعي والاستراحة الافتراضية. تُحفظ محليًا.</p>
+  <div class="row">
+    <div class="col"><label>الأساس اليومي (ساعات)</label><input id="stDaily" type="number" min="0" step="0.25" value="8"></div>
+    <div class="col"><label>الأساس الأسبوعي (ساعات)</label><input id="stWeekly" type="number" min="0" step="0.5" value="40"></div>
+    <div class="col"><label>استراحة افتراضية (دقائق)</label><input id="stBreak" type="number" min="0" step="5" value="30"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <div class="col"><button id="applySettings" class="btn-sm">تطبيق الآن</button></div>
+  </div>
+</div>
+
+  </div>  <!-- ملخص شهري -->  <div id="monthModal" class="modal" aria-hidden="true">
     <div class="dialog">
-      <h2>تسجيل الدخول / إنشاء حساب</h2>
-      <p class="small">استخدم بريدك وكلمة المرور. (مدعوم بـ Firebase Auth)</p>
+      <h2>ملخص شهري</h2>
       <div class="row">
-        <div class="col"><label>الاسم (اختياري)</label><input id="uName" placeholder="اسمك" /></div>
-        <div class="col"><label>الإيميل</label><input id="uEmail" type="email" placeholder="you@example.com" /></div>
-        <div class="col"><label>كلمة المرور</label><input id="uPass" type="password" placeholder="••••••••" /></div>
+        <div class="col"><label>اختر الشهر</label><input type="month" id="monthPick"></div>
+        <div class="col"><button class="btn-sm" id="refreshMonth">تحديث</button></div>
       </div>
-      <div id="authErr" class="err"></div>
-      <div class="actions">
-        <button class="btn-sm" id="closeAuth">إلغاء</button>
-        <button class="btn-sm" id="doSignIn">دخول</button>
-        <button class="btn-sm primary" id="doSignUp">إنشاء حساب</button>
+      <div id="monthArea" style="margin-top:12px"></div>
+      <div class="kpis">
+        <div class="kcard"><h3>مجموع الشهر</h3><div class="val" id="mTotal">0:00</div></div>
+        <div class="kcard"><h3>إضافي الشهر</h3><div class="val" id="mOT">0:00</div></div>
+        <div class="kcard"><h3>أيام مسجلة</h3><div class="val" id="mDays">0</div></div>
+        <div class="kcard"><h3>معدل اليوم</h3><div class="val" id="mAvg">0:00</div></div>
       </div>
-      <div class="sep"></div>
-      <p class="small">إذا لم تضع إعدادات Firebase سيعمل الموقع محليًا فقط (localStorage) بدون خادم.</p>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn-sm" id="closeMonth">إغلاق</button>
+      </div>
     </div>
-  </div>  <!-- نافذة التصدير العامة -->  <div id="exportModal" class="modal" aria-hidden="true">
+  </div>  <!-- نافذة التصدير -->  <div id="exportModal" class="modal" aria-hidden="true">
     <div class="dialog" style="max-width:520px">
-      <h2>تصدير البيانات</h2>
-      <p class="small">اختر النطاق والصيغة. يعمل في أي وقت.</p>
+      <h2>تصدير</h2>
       <div class="row">
         <div class="col">
           <label>النطاق</label>
           <select id="expScope">
             <option value="day">اليوم الحالي</option>
-            <option value="week">الأسبوع الحالي</option>
             <option value="month">الشهر المختار</option>
           </select>
         </div>
@@ -146,713 +154,163 @@ tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
         <button class="btn-sm primary" id="doExport">تصدير</button>
       </div>
     </div>
-  </div>  <!-- لوحة الأسابيع (Dashboard) -->  <div id=\"dashModal\" class=\"modal\" aria-hidden=\"true\">
-    <div class=\"dialog\" style=\"max-width:860px\">
-      <h2>لوحة الأسابيع المسجلة</h2>
-      <p class=\"small\">هنا تجد كل الأسابيع المحفوظة في حسابك. تستطيع فتح أي أسبوع، تنزيل JSON أو PDF، أو حذف السجل.</p>
-      <div id=\"dashArea\"></div>
-      <div class=\"actions\">
-        <button class=\"btn-sm\" id=\"closeDash\">إغلاق</button>
-      </div>
-    </div>
-  </div>  <div class=\"wrap\">
-    <div class="card" id="dayCard">
-      <h1>إدخال يومي — أسجل كل يوم بيومه</h1>
-      <p class="small">اختر تاريخ اليوم وأدخل بدايته ونهايته والاستراحة. يتم الحفظ تلقائيًا على حسابك، مع ملخص شهر كامل.</p>
-      <div class="row">
-        <div class="col"><label>تاريخ اليوم</label><input type="date" id="dayDate"></div>
-        <div class="col"><label>بداية</label><input type="time" id="dayStart"></div>
-        <div class="col"><label>نهاية</label><input type="time" id="dayEnd"></div>
-        <div class="col"><label>استراحة (د)</label><input type="number" id="dayBreak" min="0" step="5" value="30"></div>
-      </div>
-      <div class="kpis" style="margin-top:12px">
-        <div class="kcard"><h3>صافي اليوم</h3><div class="val" id="dNet">0:00</div></div>
-        <div class="kcard"><h3>إضافي اليوم</h3><div class="val" id="dOT">0:00</div></div>
-        <div class="kcard"><h3>أساس اليوم (س)</h3><div class="val" id="dBase">8</div></div>
-        <div class="kcard"><h3>حالة الحفظ</h3><div class="val" id="dSave">—</div></div>
-      </div>
-      <div class="row" style="margin-top:12px">
-        <div class="col"><button class="primary" id="saveDay">حفظ هذا اليوم</button></div>
-        <div class="col"><button class="ghost" id="openMonth">ملخص شهر</button></div>
-      </div>
-    </div><div class="card" id="weekCard" style="display:none">
-  <h1>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</h1>
-  <p class="small">أدخل أوقاتك لكل يوم. إذا كنت مسجلاً بحساب، سيتم حفظ أسابيعك في السحابة (Firestore) وربطها بحسابك.</p>
+  </div>  <!-- jsPDF فقط للتصدير -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script>
+  (function(){
+    // عناصر عامة
+    const themeBtn = document.getElementById('themeBtn');
+    const navWelcome = document.getElementById('navWelcome');
+    const navDay = document.getElementById('navDay');
+    const navMonth = document.getElementById('navMonth');
+    const navSettings = document.getElementById('navSettings');
+    const navExport = document.getElementById('navExport');
 
-  <div class="row">
-    <div class="col">
-      <label>ابدأ من أسبوع (اختر تاريخ يوم الاثنين)</label>
-      <input type="date" id="weekStart" />
-    </div>
-    <div class="col">
-      <label>الأساس اليومي (ساعات)</label>
-      <input id="baselineDay" type="number" min="0" step="0.25" value="8" />
-    </div>
-    <div class="col">
-      <label>الأساس الأسبوعي (ساعات)</label>
-      <input id="baselineWeek" type="number" min="0" step="0.5" value="40" />
-    </div>
-    <div class="col">
-      <label>استراحة افتراضية (دقائق)</label>
-      <input id="defaultBreak" type="number" min="0" step="5" value="30" />
-    </div>
-  </div>
+    const welcomeCard = document.getElementById('welcomeCard');
+    const dayCard = document.getElementById('dayCard');
+    const settingsCard = document.getElementById('settingsCard');
 
-  <div class="weekbar">
-    <button class="btn" id="prevWeek">⟵ الأسبوع السابق</button>
-    <span class="pill" id="rangeLbl">—</span>
-    <button class="btn" id="nextWeek">الأسبوع التالي ⟶</button>
-    <span class="muted" style="margin-inline-start:auto">* السبت اختياري</span>
-  </div>
+    // يومي
+    const dayDate = document.getElementById('dayDate');
+    const dayStart = document.getElementById('dayStart');
+    const dayEnd = document.getElementById('dayEnd');
+    const dayBreak = document.getElementById('dayBreak');
+    const dNet = document.getElementById('dNet');
+    const dOT = document.getElementById('dOT');
+    const dBase = document.getElementById('dBase');
+    const dSave = document.getElementById('dSave');
+    const saveDayBtn = document.getElementById('saveDay');
+    const openMonthBtn = document.getElementById('openMonth');
 
-  <div class="calendar" id="calendar"></div>
+    // الإعدادات
+    const stDaily = document.getElementById('stDaily');
+    const stWeekly = document.getElementById('stWeekly');
+    const stBreak = document.getElementById('stBreak');
+    const applySettings = document.getElementById('applySettings');
 
-  <div class="sep"></div>
-  <div class="kpis">
-    <div class="kcard"><h3>مجموع الأسبوع</h3><div class="val" id="kTotal">0:00</div></div>
-    <div class="kcard"><h3>إضافي أسبوعي</h3><div class="val" id="kOTWeek">0:00</div></div>
-    <div class="kcard"><h3>معدل اليوم (المدخل)</h3><div class="val" id="kAvg">0:00</div></div>
-    <div class="kcard"><h3>أيام مدخلة</h3><div class="val" id="kDays">0</div></div>
-  </div>
+    // عدادات أسبوع/شهر
+    const wTotal = document.getElementById('wTotal');
+    const wDelta = document.getElementById('wDelta');
+    const moTotal = document.getElementById('moTotal');
+    const moDelta = document.getElementById('moDelta');
 
-  <div class="sep"></div>
-  <div class="row">
-    <div class="col"><button class="ghost" id="fillExample">تعبئة مثال 07:00→17:30 (استراحة 45)</button></div>
-    <div class="col"><button class="ghost" id="clearAll">مسح هذا الأسبوع</button></div>
-    <div class="col"><button class="primary" id="exportJson">تصدير الأسبوع (JSON)</button></div>
-    <div class="col"><button class="ghost" id="importJson">استيراد أسبوع</button><input id="fileInput" type="file" accept="application/json" style="display:none"></div>
-  </div>
-</div>
+    // ملخص شهري
+    const monthModal = document.getElementById('monthModal');
+    const monthPick = document.getElementById('monthPick');
+    const refreshMonth = document.getElementById('refreshMonth');
+    const monthArea = document.getElementById('monthArea');
+    const closeMonth = document.getElementById('closeMonth');
+    const mTotal = document.getElementById('mTotal');
+    const mOT = document.getElementById('mOT');
+    const mDays = document.getElementById('mDays');
+    const mAvg = document.getElementById('mAvg');
 
-  </div>  <!-- ملخص شهري -->  <div id="monthModal" class="modal" aria-hidden="true">
-    <div class="dialog" style="max-width:860px">
-      <h2>ملخص شهري</h2>
-      <div class="row">
-        <div class="col"><label>اختر الشهر</label><input type="month" id="monthPick"></div>
-        <div class="col"><button class="btn" id="refreshMonth">تحديث</button></div>
-      </div>
-      <div id="monthArea" style="margin-top:12px"></div>
-      <div class="kpis">
-        <div class="kcard"><h3>مجموع الشهر</h3><div class="val" id="mTotal">0:00</div></div>
-        <div class="kcard"><h3>إضافي الشهر</h3><div class="val" id="mOT">0:00</div></div>
-        <div class="kcard"><h3>أيام مسجلة</h3><div class="val" id="mDays">0</div></div>
-        <div class="kcard"><h3>معدل اليوم</h3><div class="val" id="mAvg">0:00</div></div>
-      </div>
-      <div class="actions" style="margin-top:12px">
-        <button class="btn-sm" id="closeMonth">إغلاق</button>
-      </div>
-    </div>
-  </div>  <!-- Firebase SDKs (اختياري/موصى به لإتاحة الحسابات السحابية) -->  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>  <!-- jsPDF للتصدير PDF -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/F3xkDk5FZ+8+qJwVqFjvUeQ7P8kJcLqQp4C7cQf4uY2a7i3xW+o8W6y6EoDq8n8pXbZl9m1OQh4Gv1y3bV1sQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><script>
-(function(){
-  // === إعداد Firebase (بدّل القيم أدناه من مشروعك) ===
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    appId: "YOUR_APP_ID"
-  };
+    // تصدير
+    const exportModal = document.getElementById('exportModal');
+    const expScope = document.getElementById('expScope');
+    const expFormat = document.getElementById('expFormat');
+    const closeExport = document.getElementById('closeExport');
+    const doExport = document.getElementById('doExport');
 
-  let firebaseReady = false; let auth=null; let db=null;
-  try{
-    if(firebaseConfig.apiKey !== 'YOUR_API_KEY'){
-      firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); firebaseReady = true;
-    }
-  }catch(err){ console.warn('Firebase init skipped:', err); }
+    // ترحيب
+    const welcomeStart = document.getElementById('welcomeStart');
+    const welcomeSettings = document.getElementById('welcomeSettings');
 
-  // ======= عناصر الواجهة العامة =======
-  const cal = document.getElementById('calendar');
-  // عناصر وضع يومي
-  const dayCard = document.getElementById('dayCard');
-  const weekCard = document.getElementById('weekCard');
-  const modeSelect = document.getElementById('modeSelect');
-  const themeBtn = document.getElementById('themeBtn');
-  const dayDate = document.getElementById('dayDate');
-  const dayStart = document.getElementById('dayStart');
-  const dayEnd = document.getElementById('dayEnd');
-  const dayBreak = document.getElementById('dayBreak');
-  const dNet = document.getElementById('dNet');
-  const dOT = document.getElementById('dOT');
-  const dBase = document.getElementById('dBase');
-  const dSave = document.getElementById('dSave');
-  const saveDayBtn = document.getElementById('saveDay');
-  const openMonthBtn = document.getElementById('openMonth');
-  // ملخص شهري
-  const monthModal = document.getElementById('monthModal');
-  const monthPick = document.getElementById('monthPick');
-  const refreshMonth = document.getElementById('refreshMonth');
-  const monthArea = document.getElementById('monthArea');
-  const closeMonth = document.getElementById('closeMonth');
-  const mTotal = document.getElementById('mTotal');
-  const mOT = document.getElementById('mOT');
-  const mDays = document.getElementById('mDays');
-  const mAvg = document.getElementById('mAvg');
-  const weekStartEl = document.getElementById('weekStart');
-  const rangeLbl = document.getElementById('rangeLbl');
-  const btnPrev = document.getElementById('prevWeek');
-  const btnNext = document.getElementById('nextWeek');
+    // أدوات وقت/تنسيق
+    const LS_WELCOME_KEY='seenWelcome_v2';
+    function h2m(h){ if(!h) return 0; const [HH,MM]=h.split(':').map(Number); return HH*60+(MM||0) }
+    function m2h(m){ const sign=m<0?'-':''; m=Math.abs(m); const hh=Math.floor(m/60); const mm=Math.round(m%60); return sign+hh+':'+mm.toString().padStart(2,'0') }
+    function fmtDate(d){ return d.toISOString().slice(0,10) }
+    function parseDate(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d) }
+    function startOfWeek(d){ const x=new Date(d); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return new Date(x.getFullYear(),x.getMonth(),x.getDate()) }
+    function endOfWeek(d){ const s=startOfWeek(d); s.setDate(s.getDate()+6); return s }
 
-  const baselineDayEl = document.getElementById('baselineDay');
-  const baselineWeekEl = document.getElementById('baselineWeek');
-  const defaultBreakEl = document.getElementById('defaultBreak');
+    // إعدادات
+    function loadSettings(){ const s=JSON.parse(localStorage.getItem('settings')||'{}'); stDaily.value=s.daily??8; stWeekly.value=s.weekly??40; stBreak.value=s.break??30; dBase.textContent=String(stDaily.value); }
+    function saveSettings(){ const s={ daily:parseFloat(stDaily.value||8), weekly:parseFloat(stWeekly.value||40), break:parseInt(stBreak.value||30,10) }; localStorage.setItem('settings',JSON.stringify(s)); dBase.textContent=String(s.daily); }
 
-  const kTotal = document.getElementById('kTotal');
-  const kOTWeek = document.getElementById('kOTWeek');
-  const kAvg = document.getElementById('kAvg');
-  const kDays = document.getElementById('kDays');
+    // تخزين يومي
+    function saveDayLocal(){ const payload={ date:dayDate.value, start:dayStart.value, end:dayEnd.value, breakMin:parseInt(dayBreak.value||0,10), daily:parseFloat(stDaily.value||8) }; localStorage.setItem('otDay-'+payload.date, JSON.stringify(payload)); }
+    function loadDayLocal(dateStr){ const raw=localStorage.getItem('otDay-'+dateStr); if(raw){ try{ const p=JSON.parse(raw); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=(p.breakMin??stBreak.value)||0; }catch{} } }
 
-  const exportBtn = document.getElementById('exportJson');
-  const importBtn = document.getElementById('importJson');
-  const fileInput = document.getElementById('fileInput');
-  const fillExampleBtn = document.getElementById('fillExample');
-  const clearAllBtn = document.getElementById('clearAll');
+    // حساب اليوم + العدادات
+    function computeDay(){ const baseDayMin=Math.round(parseFloat(stDaily.value||8)*60); const s=dayStart.value,e=dayEnd.value,br=parseInt(dayBreak.value||0,10); if(!s||!e){ dNet.textContent='0:00'; dOT.textContent='0:00'; dBase.textContent=String(parseFloat(stDaily.value||8)); return {net:0,ot:0,valid:false}; } let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-baseDayMin); dNet.textContent=m2h(net); dOT.textContent=m2h(ot); dBase.textContent=String(parseFloat(stDaily.value||8)); return {net,ot,valid:true}; }
 
-  // حساب المستخدم
-  const userBtn = document.getElementById('userBtn');
-  const userMenu = document.getElementById('userMenu');
-  const avatar = document.getElementById('avatar');
-  const authModal = document.getElementById('authModal');
-  // ==== ثيم ووضع الإدخال ====
-  const openExportModal = ()=>{ exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false'); };
-  const closeExportModal = ()=>{ exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); };
-  closeExport.addEventListener('click', closeExportModal);
-  navDay.addEventListener('click', ()=>{ dayCard.style.display='block'; weekCard.style.display='none'; });
-  navWeek.addEventListener('click', ()=>{ dayCard.style.display='none'; weekCard.style.display='block'; });
-  navMonth.addEventListener('click', ()=> openMonthModal());
-  navExport.addEventListener('click', ()=> openExportModal());
-  themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
-  themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
-  modeSelect.addEventListener('change', ()=>{ const m=modeSelect.value; dayCard.style.display = m==='day'? 'block':'none'; weekCard.style.display = m==='week'? 'block':'none'; });
-  const uName = document.getElementById('uName');
-  const uEmail = document.getElementById('uEmail');
-  const uPass = document.getElementById('uPass');
-  const closeAuth = document.getElementById('closeAuth');
-  const doSignIn = document.getElementById('doSignIn');
-  const doSignUp = document.getElementById('doSignUp');
-  const menuProfile = document.getElementById('menuProfile');
-  const navDay = document.getElementById('navDay');
-  const navWeek = document.getElementById('navWeek');
-  const navMonth = document.getElementById('navMonth');
-  const navExport = document.getElementById('navExport');
-  const exportModal = document.getElementById('exportModal');
-  const expScope = document.getElementById('expScope');
-  const expFormat = document.getElementById('expFormat');
-  const closeExport = document.getElementById('closeExport');
-  const doExport = document.getElementById('doExport');
-  const menuLogout = document.getElementById('menuLogout');
-  const menuLogout = document.getElementById('menuLogout');
-  const menuDashboard = document.getElementById('menuDashboard');
-  const menuVerify = document.getElementById('menuVerify');
-  const menuReset = document.getElementById('menuReset');
-  const authErr = document.getElementById('authErr');
-  const dashModal = document.getElementById('dashModal');
-  const dashArea = document.getElementById('dashArea');
-  const closeDash = document.getElementById('closeDash');
+    function recomputeCounters(){
+      const today=parseDate(dayDate.value);
+      const ws=startOfWeek(today), we=endOfWeek(today);
+      let wSum=0; for(let d=new Date(ws); d<=we; d.setDate(d.getDate()+1)){ const raw=localStorage.getItem('otDay-'+fmtDate(d)); if(raw){ try{ const p=JSON.parse(raw); if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; wSum += Math.max(0,(em-sm)-(parseInt(p.breakMin||0,10))); } }catch{} } }
+      const weeklyTarget = Math.round(parseFloat(stWeekly.value||40)*60);
+      wTotal.textContent=m2h(wSum);
+      wDelta.textContent=(wSum>=weeklyTarget?'+':'−')+m2h(Math.abs(wSum-weeklyTarget));
 
-  // ======= أدوات وقت =======
-  const days = [
-    {key:'mon', name:'الاثنين', offset:0},
-    {key:'tue', name:'الثلاثاء', offset:1},
-    {key:'wed', name:'الأربعاء', offset:2},
-    {key:'thu', name:'الخميس', offset:3},
-    {key:'fri', name:'الجمعة', offset:4},
-    {key:'sat', name:'السبت (اختياري)', offset:5},
-  ];
-  function fmtDate(d){return d.toISOString().slice(0,10)}
-  function parseDate(str){ const [y,m,da]=str.split('-').map(Number); return new Date(y,m-1,da) }
-  function startOfWeek(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d }
-  function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d }
-  function h2m(h){ if(!h) return 0; const [HH,MM]=h.split(':').map(Number); return HH*60+(MM||0) }
-  function m2h(m){ const sign=m<0?'-':''; m=Math.abs(m); const hh=Math.floor(m/60); const mm=Math.round(m%60); return `${sign}${hh}:${mm.toString().padStart(2,'0')}` }
-  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-  function weekKey(){ return weekStartEl.value }
-  function dayKey(){ return dayDate.value }
-  function monthKeyFromDateStr(d){ return d.substring(0,7) }
-
-  // ======= بناء واجهة اليوم =======
-  function buildDayCard(dayObj, weekStart){
-    const d = addDays(weekStart, dayObj.offset);
-    const id = dayObj.key;
-
-    const wrap = document.createElement('div'); wrap.className='day'; wrap.dataset.day=id; wrap.dataset.date=fmtDate(d);
-
-    const header = document.createElement('div'); header.className='dayHeader';
-    const title = document.createElement('div'); title.className='title'; title.textContent = dayObj.name;
-    const badge = document.createElement('div'); badge.className='badge'; badge.textContent = d.toLocaleDateString('de-DE');
-    header.appendChild(title); header.appendChild(badge);
-
-    const grid = document.createElement('div'); grid.className='grid';
-    const s = document.createElement('input'); s.type='time'; s.placeholder='ابدأ';
-    const e = document.createElement('input'); e.type='time'; e.placeholder='انتهِ';
-    const b = document.createElement('input'); b.type='number'; b.min=0; b.step=5; b.value=defaultBreakEl.value; b.title='استراحة (دقائق)';
-    const bLbl = document.createElement('label'); bLbl.textContent='استراحة (د)'; bLbl.style.fontSize='12px'; bLbl.style.color='#94a3b8';
-    const bWrap = document.createElement('div'); bWrap.style.display='flex'; bWrap.style.flexDirection='column'; bWrap.appendChild(bLbl); bWrap.appendChild(b);
-
-    grid.appendChild(s); grid.appendChild(e); grid.appendChild(bWrap);
-
-    const kpi = document.createElement('div'); kpi.className='kpi';
-    const net = document.createElement('span'); net.className='tag ok'; net.textContent='الصافي: 0:00';
-    const ot = document.createElement('span'); ot.className='tag'; ot.textContent='إضافي: 0:00';
-    kpi.appendChild(net); kpi.appendChild(ot);
-
-    [s,e,b].forEach(el=> el.addEventListener('input', commit));
-
-    wrap.appendChild(header); wrap.appendChild(grid); wrap.appendChild(kpi);
-    return wrap;
-  }
-
-  function renderWeek(){
-    cal.innerHTML='';
-    const start = parseDate(weekStartEl.value);
-    const end = addDays(start,5);
-    rangeLbl.textContent = `${start.toLocaleDateString('de-DE')} — ${end.toLocaleDateString('de-DE')}`;
-    days.forEach(d=> cal.appendChild(buildDayCard(d, start)));
-    loadStateForWeek().then(()=> commit());
-  }
-  // ===== وضع يومي =====
-  function computeDay(){
-    const s=dayStart.value, e=dayEnd.value, br=clamp(parseInt(dayBreak.value||0,10),0,600);
-    if(!s||!e){ dNet.textContent='0:00'; dOT.textContent='0:00'; return {min:0,ot:0,valid:false}; }
-    let sm=h2m(s), em=h2m(e); if(em<sm) em+=1440;
-    const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
-    const total=Math.max(0,(em-sm)-br); const ot=Math.max(0,total-baseDayMin);
-    dNet.textContent=m2h(total); dOT.textContent=m2h(ot); dBase.textContent = String(parseFloat(baselineDayEl.value||8));
-    return {min:total, ot, valid:true};
-  }
-  async function saveDay(){
-    const calc = computeDay();
-    const payload = { date: dayKey(), start: dayStart.value, end: dayEnd.value, breakMin: dayBreak.value, baselineDay: baselineDayEl.value, month: monthKeyFromDateStr(dayKey()) };
-    localStorage.setItem('otDay-'+dayKey(), JSON.stringify(payload));
-    if(firebaseReady && auth.currentUser){
-      await db.collection('users').doc(auth.currentUser.uid).collection('days').doc(dayKey()).set(payload, {merge:true});
-    }
-    dSave.textContent = 'تم الحفظ'; setTimeout(()=> dSave.textContent='—', 1500);
-  }
-  async function loadDay(){
-    dSave.textContent='—';
-    const local = localStorage.getItem('otDay-'+dayKey());
-    if(local){ try{ const p=JSON.parse(local); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.breakMin||30; }catch{} }
-    if(firebaseReady && auth.currentUser){
-      const snap = await db.collection('users').doc(auth.currentUser.uid).collection('days').doc(dayKey()).get();
-      if(snap.exists){ const p=snap.data(); dayStart.value=p.start||''; dayEnd.value=p.end||''; dayBreak.value=p.breakMin||30; }
-    }
-    computeDay();
-  }
-  function openMonthModal(){ monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary(); }
-  function closeMonthModal(){ monthModal.classList.remove('open'); monthModal.setAttribute('aria-hidden','true'); }
-  async function refreshMonthSummary(){
-    const month = monthPick.value || monthKeyFromDateStr(new Date().toISOString());
-    // اجمع من المحلي
-    const list=[];
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i); if(k && k.startsWith('otDay-')){ try{ const p=JSON.parse(localStorage.getItem(k)); if(p.month===month) list.push(p); }catch{} }
-    }
-    // من السحابة
-    if(firebaseReady && auth.currentUser){
-      const ref = db.collection('users').doc(auth.currentUser.uid).collection('days');
-      const snap = await ref.where('month','==',month).get();
-      snap.forEach(doc=>{ const p=doc.data(); if(!list.find(x=>x.date===p.date)) list.push(p); });
-    }
-    list.sort((a,b)=> a.date < b.date ? -1 : 1);
-    // بناء جدول
-    let html = '<table class="table"><thead><tr><th>التاريخ</th><th>البداية</th><th>النهاية</th><th>استراحة</th><th>الصافي</th><th>إضافي</th></tr></thead><tbody>';
-    let total=0, daysCount=0; const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
-    list.forEach(p=>{ if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const br=parseInt(p.breakMin||0,10); const net=Math.max(0,(em-sm)-br); const ot=Math.max(0, net-baseDayMin); total+=net; daysCount++; html += `<tr><td>${p.date}</td><td>${p.start}</td><td>${p.end}</td><td>${p.breakMin}</td><td>${m2h(net)}</td><td>${m2h(ot)}</td></tr>`; } });
-    html += '</tbody></table>';
-    monthArea.innerHTML = html;
-    const otMonth = Math.max(0, total - (daysCount*baseDayMin));
-    mTotal.textContent = m2h(total); mOT.textContent = m2h(otMonth); mDays.textContent = String(daysCount); mAvg.textContent = daysCount? m2h(Math.round(total/daysCount)):'0:00';
-  } — ${end.toLocaleDateString('de-DE')}`;
-    days.forEach(d=> cal.appendChild(buildDayCard(d, start)));
-    // حمّل من السحابة/المحلي
-    loadStateForWeek().then(()=> commit());
-  }
-
-  function getDayData(card){
-    const inputs = card.querySelectorAll('input');
-    const s = inputs[0].value; const e = inputs[1].value; const br = clamp(parseInt(inputs[2].value||0,10),0,600);
-    if(!s || !e) return {min:0, ot:0, valid:false};
-    let sm = h2m(s); let em = h2m(e); if(em < sm) em += 24*60; // عبور منتصف الليل
-    const total = Math.max(0, (em - sm) - br);
-    const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
-    const ot = Math.max(0, total - baseDayMin);
-    return {min:total, ot, valid:true};
-  }
-
-  async function commit(){
-    let total=0, daysCount=0, otWeek=0;
-    document.querySelectorAll('.day').forEach(card=>{
-      const d = getDayData(card);
-      const [netEl, otEl] = card.querySelectorAll('.tag');
-      netEl.textContent = `الصافي: ${m2h(d.min)}`;
-      otEl.textContent = `إضافي: ${m2h(d.ot)}`;
-      otEl.className = 'tag ' + (d.ot>0? 'warn':'ok');
-      if(d.valid){ total += d.min; otWeek += d.ot; daysCount++; }
-    });
-    const baseWeekMin = Math.round(parseFloat(baselineWeekEl.value||40)*60);
-    kTotal.textContent = m2h(total);
-    kOTWeek.textContent = m2h(Math.max(0,total-baseWeekMin));
-    kAvg.textContent = daysCount? m2h(Math.round(total/daysCount)) : '0:00';
-    kDays.textContent = daysCount;
-
-    // حفظ تلقائي
-    await saveStateForWeek();
-  }
-
-  // ======= تخزين محلي/سحابي =======
-  function localKey(){ return 'otCal-'+weekKey(); }
-  function pickWeekPayload(){
-    return {
-      baselineDay: baselineDayEl.value,
-      baselineWeek: baselineWeekEl.value,
-      defaultBreak: defaultBreakEl.value,
-      days: [...document.querySelectorAll('.day')].map(card=>{
-        const inputs = card.querySelectorAll('input');
-        return {key: card.dataset.day, date: card.dataset.date, start: inputs[0].value, end: inputs[1].value, breakMin: inputs[2].value };
-      })
-    };
-  }
-
-  async function saveStateForWeek(){
-    const payload = pickWeekPayload();
-    // محلي دائمًا
-    localStorage.setItem(localKey(), JSON.stringify(payload));
-
-    // سحابي إن كان المستخدم مسجلًا وFirebase جاهز
-    const user = firebaseReady ? auth.currentUser : null;
-    if(firebaseReady && user){
-      const ref = db.collection('users').doc(user.uid).collection('weeks').doc(weekKey());
-      await ref.set(payload, { merge:true });
-    }
-  }
-
-  async function loadStateForWeek(){
-    // تحميل محلي أولاً
-    const raw = localStorage.getItem(localKey());
-    if(raw){ applyPayload(JSON.parse(raw)); }
-
-    // لو في حساب، حمّل من Firestore ويغطي المحلي
-    const user = firebaseReady ? auth.currentUser : null;
-    if(firebaseReady && user){
-      const snap = await db.collection('users').doc(user.uid).collection('weeks').doc(weekKey()).get();
-      if(snap.exists){ applyPayload(snap.data()); }
-    }
-  }
-
-  function applyPayload(s){
-    try{
-      baselineDayEl.value = s.baselineDay ?? baselineDayEl.value;
-      baselineWeekEl.value = s.baselineWeek ?? baselineWeekEl.value;
-      defaultBreakEl.value = s.defaultBreak ?? defaultBreakEl.value;
-      const map = new Map((s.days||[]).map(r=>[r.key,r]));
-      document.querySelectorAll('.day').forEach(card=>{
-        const r = map.get(card.dataset.day);
-        if(r){ const inputs = card.querySelectorAll('input'); inputs[0].value=r.start||''; inputs[1].value=r.end||''; inputs[2].value=r.breakMin ?? defaultBreakEl.value; }
-      });
-    }catch(e){ console.warn('applyPayload failed', e); }
-  }
-
-  function exportJSON(){
-    const data = {
-      meta:{ app:'Saaati', version:1, weekStart: weekKey(), exportedAt: new Date().toISOString() },
-      payload: pickWeekPayload(),
-    };
-    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob); const a = document.createElement('a');
-    a.href=url; a.download = `week-${weekKey()}.json`; a.click(); URL.revokeObjectURL(url);
-  }
-
-  function importJSONFile(file){
-    const fr = new FileReader();
-    fr.onload = ()=>{
-      try{
-        const data = JSON.parse(fr.result);
-        if(data.meta && data.meta.weekStart){ weekStartEl.value = data.meta.weekStart; }
-        renderWeek();
-        if(data.payload){ applyPayload(data.payload); commit(); }
-      }catch(e){ alert('ملف غير صالح'); }
-    };
-    fr.readAsText(file);
-  }
-
-  function setMondayOnPicker(date){ weekStartEl.value = fmtDate(startOfWeek(date)); }
-
-  // ======= حساب المستخدم (Firebase أو محلي معطّل) =======
-  function firstLetter(name){ return (name||'?').trim().charAt(0).toUpperCase() || '?' }
-  function setLoggedInUI(user){
-    if(user){
-      userBtn.textContent = user.displayName || user.email || 'الحساب';
-      avatar.style.display='flex';
-      avatar.textContent = firstLetter(user.displayName||user.email);
-      menuVerify.style.display = user.emailVerified ? 'none' : 'block';
-    }else{
-      userBtn.textContent = 'تسجيل الدخول';
-      avatar.style.display='none';
-      userMenu.classList.remove('open');
-    }
-  }else{
-      userBtn.textContent = 'تسجيل الدخول';
-      avatar.style.display='none';
-      userMenu.classList.remove('open');
-    }
-  }
-  function openAuth(){ authModal.classList.add('open'); authModal.setAttribute('aria-hidden','false'); authErr.textContent=''; }
-  function closeAuthModal(){ authModal.classList.remove('open'); authModal.setAttribute('aria-hidden','true'); }
-  function showErr(e){ authErr.textContent = e?.message || String(e); }
-
-  userBtn.addEventListener('click', (e)=>{ e.stopPropagation(); const user = firebaseReady? auth.currentUser:null; if(user){ userMenu.classList.toggle('open'); } else { openAuth(); } });
-  document.addEventListener('click', ()=> userMenu.classList.remove('open'));
-  closeAuth.addEventListener('click', closeAuthModal);
-
-  if(firebaseReady){
-    doSignUp.addEventListener('click', async()=>{
-      try{
-        const email = uEmail.value.trim(); const pass=uPass.value; const name=uName.value.trim();
-        if(!email || !pass) return showErr({message:'أدخل البريد وكلمة المرور'});
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        if(name) await cred.user.updateProfile({ displayName: name });
-        closeAuthModal(); setLoggedInUI(auth.currentUser); await renderWeek();
-      }catch(e){ showErr(e); }
-    });
-    doSignIn.addEventListener('click', async()=>{
-      try{
-        const email = uEmail.value.trim(); const pass=uPass.value;
-        if(!email || !pass) return showErr({message:'أدخل البريد وكلمة المرور'});
-        await auth.signInWithEmailAndPassword(email, pass);
-        closeAuthModal(); setLoggedInUI(auth.currentUser); await renderWeek();
-      }catch(e){ showErr(e); }
-    });
-    menuLogout.addEventListener('click', async(e)=>{ e.preventDefault(); await auth.signOut(); setLoggedInUI(null); renderWeek(); });
-    menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
-
-    auth.onAuthStateChanged(async(u)=>{
-      setLoggedInUI(u);
-      if(u){ await renderWeek(); }
-    });
-    // أزرار لوحة التحكم والتحقق وكلمة السر
-    menuDashboard.addEventListener('click', async(e)=>{ e.preventDefault(); userMenu.classList.remove('open'); await openDashboard(); });
-    menuVerify.addEventListener('click', async(e)=>{ e.preventDefault(); userMenu.classList.remove('open'); if(auth.currentUser && !auth.currentUser.emailVerified){ try{ await auth.currentUser.sendEmailVerification(); alert('أرسلنا لك رسالة تأكيد إلى بريدك.'); }catch(err){ alert(err.message); } } });
-    menuReset.addEventListener('click', async(e)=>{ e.preventDefault(); userMenu.classList.remove('open'); const email = auth.currentUser?.email || prompt('أدخل بريدك لإرسال رابط إعادة التعيين:'); if(!email) return; try{ await auth.sendPasswordResetEmail(email); alert('تم إرسال رابط إعادة تعيين كلمة السر.'); }catch(err){ alert(err.message); } });
-  } else {
-    // إن لم يكن Firebase مُعدًا، عطّل أزرار الدخول الفعلي
-    doSignUp.addEventListener('click', ()=> showErr({message:'فعّل Firebase في الكود لاستخدام التسجيل الحقيقي.'}));
-    doSignIn.addEventListener('click', ()=> showErr({message:'فعّل Firebase في الكود لاستخدام تسجيل الدخول.'}));
-    menuLogout.addEventListener('click', (e)=>{ e.preventDefault(); });
-    menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
-    menuDashboard.addEventListener('click', (e)=>{ e.preventDefault(); alert('اللوحة تحتاج Firebase لتقرأ الأسابيع من السحابة.'); });
-    menuVerify.addEventListener('click', (e)=>{ e.preventDefault(); alert('التأكيد يحتاج Firebase.'); });
-    menuReset.addEventListener('click', (e)=>{ e.preventDefault(); const email = prompt('أدخل بريدك لإرسال رابط إعادة التعيين (يتطلب Firebase):'); });
-  }));
-    doSignIn.addEventListener('click', ()=> showErr({message:'فعّل Firebase في الكود لاستخدام تسجيل الدخول.'}));
-    menuLogout.addEventListener('click', (e)=>{ e.preventDefault(); });
-    menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
-  }
-
-  // ======= وضع يومي روابط =======
-  [dayStart, dayEnd, dayBreak].forEach(el=> el.addEventListener('input', computeDay));
-  dayDate.addEventListener('change', loadDay);
-  saveDayBtn.addEventListener('click', saveDay);
-  openMonthBtn.addEventListener('click', openMonthModal);
-  closeMonth.addEventListener('click', closeMonthModal);
-  refreshMonth.addEventListener('click', refreshMonthSummary);
-
-  // ======= ربط الأحداث العامة =======
-  [baselineDayEl, baselineWeekEl, defaultBreakEl].forEach(el=> el.addEventListener('input', commit));
-  weekStartEl.addEventListener('change', renderWeek);
-  btnPrev.addEventListener('click', ()=>{ const d = parseDate(weekStartEl.value); d.setDate(d.getDate()-7); weekStartEl.value = fmtDate(d); renderWeek(); });
-  btnNext.addEventListener('click', ()=>{ const d = parseDate(weekStartEl.value); d.setDate(d.getDate()+7); weekStartEl.value = fmtDate(d); renderWeek(); });
-
-  exportBtn.addEventListener('click', exportJSON);
-  importBtn.addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', ()=>{ if(fileInput.files && fileInput.files[0]) importJSONFile(fileInput.files[0]); });
-  fillExampleBtn.addEventListener('click', ()=>{
-    document.querySelectorAll('.day').forEach((card,i)=>{
-      const inputs = card.querySelectorAll('input');
-      const preset = [
-        ['07:00','17:30',45],
-        ['07:00','17:00',30],
-        ['07:00','16:00',30],
-        ['07:30','15:30',30],
-        ['06:00','14:30',30],
-        ['', '', 30],
-      ][i] || ['', '', 30];
-      inputs[0].value=preset[0]; inputs[1].value=preset[1]; inputs[2].value=preset[2];
-    });
-    commit();
-  });
-  clearAllBtn.addEventListener('click', ()=>{
-    document.querySelectorAll('.day').forEach(card=>{
-      const inputs = card.querySelectorAll('input');
-      inputs[0].value=''; inputs[1].value=''; inputs[2].value=defaultBreakEl.value;
-    });
-    commit();
-  });
-
-  // ======= لوحة الأسابيع =======
-  function openDashModal(){ dashModal.classList.add('open'); dashModal.setAttribute('aria-hidden','false'); }
-  function closeDashModal(){ dashModal.classList.remove('open'); dashModal.setAttribute('aria-hidden','true'); }
-  closeDash.addEventListener('click', closeDashModal);
-
-  async function openDashboard(){
-    if(!(firebaseReady && auth.currentUser)){ return alert('سجّل الدخول أولاً'); }
-    dashArea.innerHTML = '<p class="small">جارٍ التحميل...</p>';
-    openDashModal();
-    const list = await fetchWeeksList();
-    if(!list.length){ dashArea.innerHTML = '<p class="small">لا توجد أسابيع محفوظة بعد.</p>'; return; }
-    const table = document.createElement('table'); table.className='table';
-    table.innerHTML = '<thead><tr><th>الأسبوع يبدأ</th><th>إجمالي الساعات</th><th>إضافي</th><th>إجراءات</th></tr></thead><tbody></tbody>';
-    const tbody = table.querySelector('tbody');
-    list.forEach(item=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${item.id}</td><td>${item.total||'-'}</td><td>${item.ot||'-'}</td>`;
-      const tdAct = document.createElement('td');
-      const btnOpen = mkBtn('فتح','btn-sm'); btnOpen.onclick=()=>{ weekStartEl.value=item.id; closeDashModal(); renderWeek(); };
-      const btnJson = mkBtn('JSON','btn-sm'); btnJson.onclick=()=>downloadWeekJSON(item.id, item.data);
-      const btnPdf = mkBtn('PDF','btn-sm'); btnPdf.onclick=()=>downloadWeekPDF(item.id, item.data);
-      const btnDel = mkBtn('حذف','btn-sm'); btnDel.onclick=()=>deleteWeek(item.id);
-      tdAct.append(btnOpen, btnJson, btnPdf, btnDel); tr.appendChild(tdAct); tbody.appendChild(tr);
-    });
-    dashArea.innerHTML=''; dashArea.appendChild(table);
-  }
-
-  function mkBtn(txt, cls){ const b=document.createElement('button'); b.textContent=txt; b.className=cls; return b }
-
-  async function fetchWeeksList(){
-    const out=[]; const ref = db.collection('users').doc(auth.currentUser.uid).collection('weeks');
-    const snap = await ref.get();
-    snap.forEach(doc=>{
-      const data = doc.data()||{}; // حساب سريع للمجموع/الإضافي من الحقول المخزنة
-      const totals = sumWeekFromPayload(data);
-      out.push({ id: doc.id, data, total: totals.total, ot: totals.ot });
-    });
-    // رتب تنازليًا حسب التاريخ النصي
-    out.sort((a,b)=> a.id < b.id ? 1 : -1);
-    return out;
-  }
-
-  function sumWeekFromPayload(payload){
-    try{
-      const baseWeekMin = Math.round(parseFloat((payload.baselineWeek??40))*60);
-      let totalMin=0; (payload.days||[]).forEach(d=>{ if(d.start && d.end){ let sm=h2m(d.start), em=h2m(d.end); if(em<sm) em+=1440; const br=parseInt(d.breakMin||0,10); totalMin += Math.max(0,(em-sm)-br); } });
-      return { total: m2h(totalMin), ot: m2h(Math.max(0,totalMin-baseWeekMin)) };
-    }catch{ return { total:'-', ot:'-' } }
-  }
-
-  async function deleteWeek(id){
-    if(!confirm('تأكيد حذف الأسبوع '+id+'؟')) return;
-    try{
-      await db.collection('users').doc(auth.currentUser.uid).collection('weeks').doc(id).delete();
-      localStorage.removeItem('otCal-'+id);
-      await openDashboard();
-    }catch(e){ alert(e.message); }
-  }
-
-  function downloadWeekJSON(id, payload){
-    const data = { meta:{ app:'Saaati', version:1, weekStart:id, exportedAt:new Date().toISOString() }, payload };
-    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob); const a = document.createElement('a');
-    a.href=url; a.download = `week-${id}.json`; a.click(); URL.revokeObjectURL(url);
-  }
-
-  function downloadWeekPDF(id, payload){
-    try{
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation:'p', unit:'pt', format:'a4' });
-      const pad=40; let y=pad; const line= (txt)=>{ doc.text(String(txt), pad, y); y+=18; };
-      doc.setFontSize(16); doc.text('تقرير أسبوع العمل — '+id, pad, y); y+=26; doc.setFontSize(12);
-      line('الأساس اليومي: '+(payload.baselineDay||'—')+' ساعة');
-      line('الأساس الأسبوعي: '+(payload.baselineWeek||'—')+' ساعة');
-      line('استراحة افتراضية: '+(payload.defaultBreak||0)+' دقيقة'); y+=10;
-      doc.text('الأيام:', pad, y); y+=16;
-      (payload.days||[]).forEach(d=>{ line(`${d.key} (${d.date}) — ${d.start||'—'} → ${d.end||'—'} | استراحة ${d.breakMin||0}د`); });
-      const sums = sumWeekFromPayload(payload);
-      y+=10; line('الإجمالي: '+sums.total+' — الإضافي: '+sums.ot);
-      doc.save(`week-${id}.pdf`);
-    }catch(e){ alert('تعذّر إنشاء PDF: '+e.message); }
-  }
-
-  // ======= تصدير: يوم/أسبوع/شهر =======
-  function buildDayPayload(){
-    return { date: dayKey(), start: dayStart.value, end: dayEnd.value, breakMin: dayBreak.value, baselineDay: baselineDayEl.value };
-  }
-  function exportDayJSON(){
-    const data = { meta:{ app:'Saaati', scope:'day', date:dayKey(), exportedAt:new Date().toISOString() }, payload: buildDayPayload() };
-    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download=`day-${dayKey()}.json`; a.click(); URL.revokeObjectURL(url);
-  }
-  function exportDayPDF(){
-    try{ const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit:'pt', format:'a4' }); const pad=40; let y=pad; const p=buildDayPayload(); const sum=computeDay();
-      doc.setFontSize(16); doc.text('تقرير يوم العمل — '+p.date, pad, y); y+=26; doc.setFontSize(12);
-      doc.text(`البداية: ${p.start} — النهاية: ${p.end} — استراحة: ${p.breakMin}د`, pad, y); y+=18;
-      doc.text(`الصافي: ${m2h(sum.min)} — الإضافي: ${m2h(sum.ot)} — أساس اليوم: ${p.baselineDay}س`, pad, y);
-      doc.save(`day-${p.date}.pdf`);
-    }catch(e){ alert('تعذّر إنشاء PDF لليوم: '+e.message); }
-  }
-  function exportMonthJSON(){
-    const month = monthPick.value || monthKeyFromDateStr(new Date().toISOString());
-    // اجمع قائمة الشهر من الملخص الحالي إذا كان معروضًا، أو استدعِ التحديث
-    const table = monthArea.querySelector('table');
-    if(!table){ /* لا شيء */ }
-    // لإيجاز: نجمع من المحلي + السحابة مثل refreshMonthSummary
-    // سنستخدم نفس الوظيفة لجلب القائمة ثم نصدر
-  }
-
-  doExport.addEventListener('click', async()=>{
-    const scope = expScope.value; const fmt = expFormat.value;
-    try{
-      if(scope==='day'){
-        if(fmt==='json') exportDayJSON(); else exportDayPDF();
-      } else if(scope==='week'){
-        // استخدم الدوال الموجودة للأسبوع
-        const payload = pickWeekPayload();
-        if(fmt==='json') exportJSON(); else downloadWeekPDF(weekKey(), payload);
-      } else if(scope==='month'){
-        // نعيد استخدام توليد الملخص ثم نصنع PDF/JSON سريعًا من DOM
-        await refreshMonthSummary();
-        const month = monthPick.value || monthKeyFromDateStr(new Date().toISOString());
-        if(fmt==='json'){
-          // استخراج صفوف الجدول
-          const rows = [...monthArea.querySelectorAll('tbody tr')].map(tr=>{
-            const tds=[...tr.children].map(td=>td.textContent.trim());
-            return {date:tds[0], start:tds[1], end:tds[2], breakMin:tds[3], net:tds[4], ot:tds[5]};
-          });
-          const data = { meta:{ app:'Saaati', scope:'month', month, exportedAt:new Date().toISOString() }, rows, totals:{ total:mTotal.textContent, ot:mOT.textContent, days:mDays.textContent, avg:mAvg.textContent } };
-          const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-          const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);
-        } else {
-          const { jsPDF } = window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pad=40; let y=pad; doc.setFontSize(16); doc.text('تقرير الشهر — '+month, pad, y); y+=26; doc.setFontSize(11);
-          // رؤوس
-          const head=['التاريخ','البداية','النهاية','استراحة','الصافي','الإضافي'];
-          doc.text(head.join(' | '), pad, y); y+=16;
-          [...monthArea.querySelectorAll('tbody tr')].forEach(tr=>{ const line=[...tr.children].map(td=>td.textContent.trim()).join(' | '); doc.text(line, pad, y); y+=14; if(y>760){ doc.addPage(); y=pad; }
-          });
-          y+=10; doc.text(`الإجمالي: ${mTotal.textContent} — الإضافي: ${mOT.textContent} — الأيام: ${mDays.textContent} — المعدل: ${mAvg.textContent}`, pad, y);
-          doc.save(`month-${month}.pdf`);
-        }
+      // شهر
+      const y=today.getFullYear(), m=today.getMonth();
+      let mSum=0, workdaysPassed=0;
+      for(let d=new Date(y,m,1); d<=today; d.setDate(d.getDate()+1)){
+        const wd=d.getDay(); if(wd>=1 && wd<=5) workdaysPassed++; // Mon-Fri
+        const raw=localStorage.getItem('otDay-'+fmtDate(d)); if(raw){ try{ const p=JSON.parse(raw); if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; mSum += Math.max(0,(em-sm)-(parseInt(p.breakMin||0,10))); } }catch{} }
       }
-      closeExportModal();
-    }catch(e){ alert('تعذر التصدير: '+e.message); }
-  });
-      inputs[0].value=''; inputs[1].value=''; inputs[2].value=defaultBreakEl.value;
-    });
-    commit();
-  });
-
-  // Init — الإثنين الأقرب
-  function initWeek(){ setMondayOnPicker(new Date()); renderWeek(); }
-  // ضبط الوضع الافتراضي: يومي + تاريخ اليوم + ثيم مريح
-  modeSelect.value='day'; dayCard.style.display='block'; weekCard.style.display='none';
-  document.body.classList.add('light'); themeBtn.textContent='ثيم داكن';
-  dayDate.value = new Date().toISOString().slice(0,10); loadDay();
-  initWeek();
-})();
-</script><!-- ===== Firestore Security Rules (انسخها في قسم Rules) =====
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{uid}/weeks/{weekKey} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      moTotal.textContent=m2h(mSum);
+      const monthlyTarget = workdaysPassed*Math.round(parseFloat(stDaily.value||8)*60);
+      moDelta.textContent=(mSum>=monthlyTarget?'+':'−')+m2h(Math.abs(mSum-monthlyTarget));
     }
-  }
-}
---></body>
-          </html>
+
+    // ملخص شهري
+    function openMonthModal(){ monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary(); }
+    function closeMonthModal(){ monthModal.classList.remove('open'); monthModal.setAttribute('aria-hidden','true'); }
+    async function refreshMonthSummary(){ const month=monthPick.value || dayDate.value.substring(0,7); const list=[]; const y=parseInt(month.substring(0,4),10), mo=parseInt(month.substring(5,7),10)-1; const first=new Date(y,mo,1); const last=new Date(y,mo+1,0); for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){ const raw=localStorage.getItem('otDay-'+fmtDate(d)); if(raw){ try{ const p=JSON.parse(raw); list.push(p); }catch{} } } list.sort((a,b)=> a.date<b.date?-1:1); let html='<table class="table"><thead><tr><th>التاريخ</th><th>البداية</th><th>النهاية</th><th>استراحة</th><th>الصافي</th><th>إضافي</th></tr></thead><tbody>'; let total=0, daysCount=0; const baseDayMin=Math.round(parseFloat(stDaily.value||8)*60); list.forEach(p=>{ if(p.start&&p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const br=parseInt(p.breakMin||0,10); const net=Math.max(0,(em-sm)-br); const ot=Math.max(0,net-baseDayMin); total+=net; daysCount++; html+=`<tr><td>${p.date}</td><td>${p.start}</td><td>${p.end}</td><td>${p.breakMin}</td><td>${m2h(net)}</td><td>${m2h(ot)}</td></tr>`; } }); html+='</tbody></table>'; monthArea.innerHTML=html; const otMonth=Math.max(0,total-(daysCount*baseDayMin)); mTotal.textContent=m2h(total); mOT.textContent=m2h(otMonth); mDays.textContent=String(daysCount); mAvg.textContent=daysCount? m2h(Math.round(total/daysCount)):'0:00'; }
+
+    // تصدير
+    function openExport(){ exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false'); }
+    function closeExportMod(){ exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); }
+    function getDayPayload(){ return { date:dayDate.value, start:dayStart.value, end:dayEnd.value, breakMin:parseInt(dayBreak.value||0,10), daily:parseFloat(stDaily.value||8) }; }
+    function downloadJSON(filename, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url); }
+    function exportDayJSON(){ const data={ meta:{scope:'day',date:dayDate.value,exportedAt:new Date().toISOString()}, payload:getDayPayload() }; downloadJSON(`day-${dayDate.value}.json`, data); }
+    function exportDayPDF(){ const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pad=40; let y=pad; const sum=computeDay(); const p=getDayPayload(); doc.setFontSize(16); doc.text('تقرير يوم العمل — '+p.date, pad, y); y+=26; doc.setFontSize(12); doc.text(`البداية: ${p.start} — النهاية: ${p.end} — استراحة: ${p.breakMin}د`, pad, y); y+=18; doc.text(`الصافي: ${m2h(sum.net)} — الإضافي: ${m2h(sum.ot)} — أساس اليوم: ${stDaily.value}س`, pad, y); doc.save(`day-${p.date}.pdf`); }
+    function exportMonthJSON(){ const month=monthPick.value || dayDate.value.substring(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={ meta:{scope:'month',month,exportedAt:new Date().toISOString()}, rows, totals:{ total:mTotal.textContent, ot:mOT.textContent, days:mDays.textContent, avg:mAvg.textContent } }; downloadJSON(`month-${month}.json`, data); }
+    function exportMonthPDF(){ const month=monthPick.value || dayDate.value.substring(0,7); const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); const pad=40; let y=pad; doc.setFontSize(16); doc.text('تقرير الشهر — '+month, pad, y); y+=26; doc.setFontSize(11); const head=['التاريخ','البداية','النهاية','استراحة','الصافي','الإضافي']; doc.text(head.join(' | '), pad, y); y+=16; [...monthArea.querySelectorAll('tbody tr')].forEach(tr=>{ const line=[...tr.children].map(td=>td.textContent.trim()).join(' | '); doc.text(line, pad, y); y+=14; if(y>760){ doc.addPage(); y=pad; } }); y+=10; doc.text(`الإجمالي: ${mTotal.textContent} — الإضافي: ${mOT.textContent} — الأيام: ${mDays.textContent} — المعدل: ${mAvg.textContent}`, pad, y); doc.save(`month-${month}.pdf`); }
+
+    // تنقل وعرض
+    function showOnly(card){ [welcomeCard,dayCard,settingsCard].forEach(el=> el.style.display='none'); card.style.display='block'; }
+    navWelcome.addEventListener('click', ()=> showOnly(welcomeCard));
+    navDay.addEventListener('click', ()=> showOnly(dayCard));
+    navMonth.addEventListener('click', ()=> openMonthModal());
+    navSettings.addEventListener('click', ()=>{ loadSettings(); showOnly(settingsCard); });
+    navExport.addEventListener('click', ()=> openExport());
+    themeBtn.addEventListener('click', ()=>{ document.body.classList.toggle('light'); themeBtn.textContent = document.body.classList.contains('light')? 'ثيم داكن' : 'ثيم مريح'; });
+
+    // ترحيب
+    if(localStorage.getItem(LS_WELCOME_KEY)==='1'){ showOnly(dayCard); } else { showOnly(welcomeCard); }
+    welcomeStart.addEventListener('click', ()=>{ localStorage.setItem(LS_WELCOME_KEY,'1'); showOnly(dayCard); });
+    welcomeSettings.addEventListener('click', ()=>{ localStorage.setItem(LS_WELCOME_KEY,'1'); loadSettings(); showOnly(settingsCard); });
+
+    // يومي روابط
+    [dayStart, dayEnd, dayBreak].forEach(el=> el.addEventListener('input', ()=>{ computeDay(); }));
+    dayDate.addEventListener('change', ()=>{ loadDayLocal(dayDate.value); computeDay(); recomputeCounters(); });
+    saveDayBtn.addEventListener('click', ()=>{ saveDayLocal(); dSave.textContent='تم الحفظ'; setTimeout(()=> dSave.textContent='—',1200); recomputeCounters(); });
+    openMonthBtn.addEventListener('click', openMonthModal);
+
+    // ملخص شهري روابط
+    closeMonth.addEventListener('click', closeMonthModal);
+    refreshMonth.addEventListener('click', refreshMonthSummary);
+
+    // تصدير روابط
+    closeExport.addEventListener('click', closeExportMod);
+    doExport.addEventListener('click', async ()=>{ 
+      if(expScope.value==='day'){ expFormat.value==='json' ? exportDayJSON() : exportDayPDF(); }
+      else { await refreshMonthSummary(); expFormat.value==='json' ? exportMonthJSON() : exportMonthPDF(); }
+      closeExportMod();
+    });
+
+    // إعدادات
+    applySettings.addEventListener('click', ()=>{ saveSettings(); computeDay(); recomputeCounters(); alert('تم تطبيق الإعدادات'); });
+
+    // تهيئة
+    loadSettings();
+    document.body.classList.add('light'); themeBtn.textContent='ثيم داكن';
+    dayDate.value = new Date().toISOString().slice(0,10);
+    loadDayLocal(dayDate.value);
+    computeDay();
+    recomputeCounters();
+  })();
+  </script></body>
+</html>
