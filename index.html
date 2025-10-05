@@ -133,7 +133,19 @@ const LS_LANG='saaati_lang';
 
 function setLang(lang){
   const L=I18N[lang]||I18N.ar; document.documentElement.lang=lang; document.documentElement.dir=L.dir; document.body.dir=L.dir;
-  brandTxt.textContent=L.brand; navDay.textContent=L.nav.day; navMonth.textContent=L.nav.month; navSettings.textContent=L.nav.settings; navExport.textContent = `${L.flag} ${L.nav.export}`;
+  brandTxt.textContent=L.brand; navDay.textContent=L.nav.day; navMonth.textContent=L.nav.month; navSettings.textContent=L.nav.settings; navExport.textContent = `${L.flag||''} ${L.nav.export}`.trim();
+  themeBtn.textContent = (document.body.classList.contains('dark')? L.themeDark : L.themeLight);
+  titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
+  titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
+  titleMonth.textContent=L.month.title; lblPickMonth.textContent=L.month.pick; mk1.textContent=L.month.m1; mk2.textContent=L.month.m2; mk3.textContent=L.month.m3; refreshMonth.textContent=L.month.refresh; closeMonth.textContent=L.month.close;
+  titleExport.textContent=L.export.title; lblScope.textContent=L.export.scope; lblFormat.textContent=L.export.format; expScope.options[0].text=L.export.optDay; expScope.options[1].text=L.export.optMonth; 
+  expFormat.options[0].text=L.export.png; expFormat.options[1].text=L.export.json;
+  closeExport.textContent=L.export.cancel; doExport.textContent=L.export.do;
+  localStorage.setItem(LS_LANG, lang);
+  // تحديث اسم اليوم فورًا بعد تغيير اللغة
+  updateDayName();
+  if(monthArea.dataset.built==='1'){ buildMonthTableHead(lang); }
+} ${L.nav.export}`;
   themeBtn.textContent = (document.body.classList.contains('dark')? L.themeDark : L.themeLight);
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
   titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
@@ -223,7 +235,12 @@ function loadDay(){
 }catch{} } compute(); }
 
 // Month
-function openMonth(){ monthModal.classList.add('open'); monthModal.setAttribute('aria-hidden','false'); refreshMonthSummary(); }
+function openMonth(){
+  if(!monthPick.value){ monthPick.value = dayDate.value.slice(0,7); }
+  monthModal.classList.add('open');
+  monthModal.setAttribute('aria-hidden','false');
+  refreshMonthSummary();
+}
 function closeMonthFn(){ monthModal.classList.remove('open'); monthModal.setAttribute('aria-hidden','true'); }
 function refreshMonthSummary(){ const month=monthPick.value || dayDate.value.slice(0,7); const [y,mo]=month.split('-').map(Number); const first=new Date(y,mo-1,1), last=new Date(y,mo,0); const baseDay=Math.round(parseFloat(stDaily.value||8)*60); const rows=[]; let total=0, daysCount=0; for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){ const key='day-'+d.toISOString().slice(0,10); const raw=localStorage.getItem(key); if(!raw) continue; try{ const p=JSON.parse(raw); if(p.start && p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-parseInt(p.break||0,10)); const ot=Math.max(0, net-baseDay); rows.push([key.slice(4), p.start, p.end, p.break||0, m2h(net), m2h(ot)]); total+=net; daysCount++; } }catch{} } rows.sort((a,b)=> a[0]<b[0]?-1:1); const lang=langSel.value||'ar'; const L=I18N[lang]; let html=`<table class="table"><thead></thead><tbody>`; rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>` ); html+='</tbody></table>'; monthArea.innerHTML=html; monthArea.dataset.built='1'; buildMonthTableHead(lang); mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount? m2h(Math.round(total/daysCount)):'0:00'; }
 
@@ -290,14 +307,16 @@ closeMonth.addEventListener('click', ()=> monthModal.classList.remove('open'));
 closeExport.addEventListener('click', ()=> exportModal.classList.remove('open'));
 doExport.addEventListener('click', ()=>{ if(expScope.value==='day'){ expFormat.value==='json'? exportDayJSON() : exportDayPNG(); } else { expFormat.value==='json'? exportMonthJSON() : exportMonthPNG(); } exportModal.classList.remove('open'); });
 
-// Init
-const savedLang = localStorage.getItem(LS_LANG) || (navigator.language.startsWith('ar')?'ar':navigator.language.startsWith('de')?'de':'en');
-langSel.value = savedLang; setLang(savedLang);
-
-dayDate.value = new Date().toISOString().slice(0,10);
-updateDayName();
-loadSettings();
-loadDay();
-compute();
-</script></body>
-</html>
+// Init (after DOM ready)
+function initApp(){
+  const savedLang = localStorage.getItem(LS_LANG) || (navigator.language.startsWith('ar')?'ar':navigator.language.startsWith('de')?'de':'en');
+  langSel.value = savedLang; setLang(savedLang);
+  dayDate.value = new Date().toISOString().slice(0,10);
+  updateDayName();
+  loadSettings();
+  loadDay();
+  compute();
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', initApp);
+}else{ initApp(); }
