@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</title>
+  <title>ساعاتي — حاسبة الدوام والإضافي مع حسابات</title>
   <style>
     :root{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
     *{box-sizing:border-box}
@@ -15,11 +15,32 @@
     .col{flex:1 1 220px}
     label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
     input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink)}
-    input[type="time"], input[type="date"], input[type="number"]{direction:ltr}
+    input[type="time"], input[type="date"], input[type="number"], input[type="email"], input[type="password"]{direction:ltr}
     button{cursor:pointer}
     .primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none}
     .ghost{background:transparent}
-    .muted{color:var(--muted)}/* تقويم أسبوعي */
+    .muted{color:var(--muted)}/* شريط علوي وحساب */
+.topbar{position:sticky;top:0;z-index:10;background:#0c1426;border-bottom:1px solid #1f2b40}
+.topbar .inner{max-width:1060px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.brand{font-weight:800}
+.spacer{flex:1}
+.avatar{width:32px;height:32px;border-radius:999px;background:#23314a;display:flex;align-items:center;justify-content:center;font-weight:700}
+.btn-sm{padding:6px 10px;border-radius:10px;border:1px solid #2a3a55;background:#0a1222;color:#e5e7eb;cursor:pointer}
+.dropdown{position:relative}
+.menu{position:absolute;right:0;top:120%;background:#0a1222;border:1px solid #2a3a55;border-radius:12px;min-width:240px;display:none}
+.menu.open{display:block}
+.menu a{display:block;padding:10px 12px;color:#e5e7eb;text-decoration:none;border-bottom:1px solid #1f2b40}
+.menu a:last-child{border-bottom:none}
+
+/* حوار */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.dialog{background:#0e1528;border:1px solid #1f2b40;border-radius:16px;max-width:520px;width:100%;padding:16px}
+.dialog h2{margin:0 0 10px;font-size:18px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.err{color:#fecaca;font-size:12px}
+
+/* تقويم أسبوعي */
 .weekbar{display:flex;align-items:center;gap:8px;margin:8px 0 12px}
 .btn{padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink)}
 .btn:disabled{opacity:.6}
@@ -44,14 +65,63 @@
 .kcard h3{margin:0;color:var(--muted);font-size:12px}
 .kcard .val{font-size:20px;font-weight:700;margin-top:6px}
 .sep{height:1px;background:var(--line);margin:14px 0}
+  .table{width:100%;border-collapse:separate;border-spacing:0 8px}
+th,td{padding:10px 12px;text-align:center}
+thead th{font-size:12px;color:#93a4b9}
+tbody tr{background:#0a1222;border:1px solid #1f2b40}
+tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
+tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
 
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">⏱️ ساعاتي</div>
+      <div class="spacer"></div>
+      <div id="userArea" class="dropdown">
+        <button id="userBtn" class="btn-sm">تسجيل الدخول</button>
+        <div id=\"userMenu\" class=\"menu\">
+          <a href=\"#\" id=\"menuDashboard\">لوحة الأسابيع</a>
+          <a href=\"#\" id=\"menuVerify\">تأكيد البريد</a>
+          <a href=\"#\" id=\"menuReset\">إعادة تعيين كلمة السر</a>
+          <a href=\"#\" id=\"menuProfile\">الملف الشخصي</a>
+          <a href=\"#\" id=\"menuLogout\">تسجيل الخروج</a>
+        </div>
+      </div>
+      <div id="avatar" class="avatar" title="المستخدم" style="display:none">?</div>
+    </div>
+  </div>  <div id="authModal" class="modal" aria-hidden="true">
+    <div class="dialog">
+      <h2>تسجيل الدخول / إنشاء حساب</h2>
+      <p class="small">استخدم بريدك وكلمة المرور. (مدعوم بـ Firebase Auth)</p>
+      <div class="row">
+        <div class="col"><label>الاسم (اختياري)</label><input id="uName" placeholder="اسمك" /></div>
+        <div class="col"><label>الإيميل</label><input id="uEmail" type="email" placeholder="you@example.com" /></div>
+        <div class="col"><label>كلمة المرور</label><input id="uPass" type="password" placeholder="••••••••" /></div>
+      </div>
+      <div id="authErr" class="err"></div>
+      <div class="actions">
+        <button class="btn-sm" id="closeAuth">إلغاء</button>
+        <button class="btn-sm" id="doSignIn">دخول</button>
+        <button class="btn-sm primary" id="doSignUp">إنشاء حساب</button>
+      </div>
+      <div class="sep"></div>
+      <p class="small">إذا لم تضع إعدادات Firebase سيعمل الموقع محليًا فقط (localStorage) بدون خادم.</p>
+    </div>
+  </div>  <!-- لوحة الأسابيع (Dashboard) -->  <div id=\"dashModal\" class=\"modal\" aria-hidden=\"true\">
+    <div class=\"dialog\" style=\"max-width:860px\">
+      <h2>لوحة الأسابيع المسجلة</h2>
+      <p class=\"small\">هنا تجد كل الأسابيع المحفوظة في حسابك. تستطيع فتح أي أسبوع، تنزيل JSON أو PDF، أو حذف السجل.</p>
+      <div id=\"dashArea\"></div>
+      <div class=\"actions\">
+        <button class=\"btn-sm\" id=\"closeDash\">إغلاق</button>
+      </div>
+    </div>
+  </div>  <div class=\"wrap\">
     <div class="card">
       <h1>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</h1>
-      <p class="small">واجهة بسيطة تشبه الرزنامة: لكل يوم بطاقة مستقلة تدخل فيها <strong>وقت البدء</strong> و<strong>وقت الانتهاء</strong> و<strong>الاستراحة (دقائق)</strong>. الحاسبة تخصم الاستراحة وتعرض الصافي والإضافي لكل يوم، مع ملخص أسبوعي.</p><div class="row">
+      <p class="small">أدخل أوقاتك لكل يوم. إذا كنت مسجلاً بحساب، سيتم حفظ أسابيعك في السحابة (Firestore) وربطها بحسابك.</p><div class="row">
     <div class="col">
       <label>ابدأ من أسبوع (اختر تاريخ يوم الاثنين)</label>
       <input type="date" id="weekStart" />
@@ -96,17 +166,24 @@
   </div>
 </div>
 
-  </div><script>
+  </div>  <!-- Firebase SDKs (اختياري/موصى به لإتاحة الحسابات السحابية) -->  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>  <!-- jsPDF للتصدير PDF -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/F3xkDk5FZ+8+qJwVqFjvUeQ7P8kJcLqQp4C7cQf4uY2a7i3xW+o8W6y6EoDq8n8pXbZl9m1OQh4Gv1y3bV1sQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><script>
 (function(){
-  const days = [
-    {key:'mon', name:'الاثنين', offset:0},
-    {key:'tue', name:'الثلاثاء', offset:1},
-    {key:'wed', name:'الأربعاء', offset:2},
-    {key:'thu', name:'الخميس', offset:3},
-    {key:'fri', name:'الجمعة', offset:4},
-    {key:'sat', name:'السبت (اختياري)', offset:5},
-  ];
+  // === إعداد Firebase (بدّل القيم أدناه من مشروعك) ===
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    appId: "YOUR_APP_ID"
+  };
 
+  let firebaseReady = false; let auth=null; let db=null;
+  try{
+    if(firebaseConfig.apiKey !== 'YOUR_API_KEY'){
+      firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); firebaseReady = true;
+    }
+  }catch(err){ console.warn('Firebase init skipped:', err); }
+
+  // ======= عناصر الواجهة العامة =======
   const cal = document.getElementById('calendar');
   const weekStartEl = document.getElementById('weekStart');
   const rangeLbl = document.getElementById('rangeLbl');
@@ -128,23 +205,46 @@
   const fillExampleBtn = document.getElementById('fillExample');
   const clearAllBtn = document.getElementById('clearAll');
 
+  // حساب المستخدم
+  const userBtn = document.getElementById('userBtn');
+  const userMenu = document.getElementById('userMenu');
+  const avatar = document.getElementById('avatar');
+  const authModal = document.getElementById('authModal');
+  const uName = document.getElementById('uName');
+  const uEmail = document.getElementById('uEmail');
+  const uPass = document.getElementById('uPass');
+  const closeAuth = document.getElementById('closeAuth');
+  const doSignIn = document.getElementById('doSignIn');
+  const doSignUp = document.getElementById('doSignUp');
+  const menuProfile = document.getElementById('menuProfile');
+  const menuLogout = document.getElementById('menuLogout');
+  const menuDashboard = document.getElementById('menuDashboard');
+  const menuVerify = document.getElementById('menuVerify');
+  const menuReset = document.getElementById('menuReset');
+  const authErr = document.getElementById('authErr');
+  const dashModal = document.getElementById('dashModal');
+  const dashArea = document.getElementById('dashArea');
+  const closeDash = document.getElementById('closeDash');
+
+  // ======= أدوات وقت =======
+  const days = [
+    {key:'mon', name:'الاثنين', offset:0},
+    {key:'tue', name:'الثلاثاء', offset:1},
+    {key:'wed', name:'الأربعاء', offset:2},
+    {key:'thu', name:'الخميس', offset:3},
+    {key:'fri', name:'الجمعة', offset:4},
+    {key:'sat', name:'السبت (اختياري)', offset:5},
+  ];
   function fmtDate(d){return d.toISOString().slice(0,10)}
   function parseDate(str){ const [y,m,da]=str.split('-').map(Number); return new Date(y,m-1,da) }
-
-  function startOfWeek(date){
-    // اجعل الإثنين بداية الأسبوع حسب ألمانيا
-    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const day = (d.getDay()+6)%7; // 0=Mon,6=Sun
-    d.setDate(d.getDate() - day);
-    return d;
-  }
-
+  function startOfWeek(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d }
   function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d }
-
   function h2m(h){ if(!h) return 0; const [HH,MM]=h.split(':').map(Number); return HH*60+(MM||0) }
   function m2h(m){ const sign=m<0?'-':''; m=Math.abs(m); const hh=Math.floor(m/60); const mm=Math.round(m%60); return `${sign}${hh}:${mm.toString().padStart(2,'0')}` }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function weekKey(){ return weekStartEl.value }
 
+  // ======= بناء واجهة اليوم =======
   function buildDayCard(dayObj, weekStart){
     const d = addDays(weekStart, dayObj.offset);
     const id = dayObj.key;
@@ -161,7 +261,6 @@
     const e = document.createElement('input'); e.type='time'; e.placeholder='انتهِ';
     const b = document.createElement('input'); b.type='number'; b.min=0; b.step=5; b.value=defaultBreakEl.value; b.title='استراحة (دقائق)';
     const bLbl = document.createElement('label'); bLbl.textContent='استراحة (د)'; bLbl.style.fontSize='12px'; bLbl.style.color='#94a3b8';
-
     const bWrap = document.createElement('div'); bWrap.style.display='flex'; bWrap.style.flexDirection='column'; bWrap.appendChild(bLbl); bWrap.appendChild(b);
 
     grid.appendChild(s); grid.appendChild(e); grid.appendChild(bWrap);
@@ -183,9 +282,8 @@
     const end = addDays(start,5);
     rangeLbl.textContent = `${start.toLocaleDateString('de-DE')} — ${end.toLocaleDateString('de-DE')}`;
     days.forEach(d=> cal.appendChild(buildDayCard(d, start)));
-    // بعد بناء الواجهة، حمّل حالة الأسبوع إن وجدت
-    loadStateForWeek();
-    commit();
+    // حمّل من السحابة/المحلي
+    loadStateForWeek().then(()=> commit());
   }
 
   function getDayData(card){
@@ -199,7 +297,7 @@
     return {min:total, ot, valid:true};
   }
 
-  function commit(){
+  async function commit(){
     let total=0, daysCount=0, otWeek=0;
     document.querySelectorAll('.day').forEach(card=>{
       const d = getDayData(card);
@@ -214,58 +312,72 @@
     kOTWeek.textContent = m2h(Math.max(0,total-baseWeekMin));
     kAvg.textContent = daysCount? m2h(Math.round(total/daysCount)) : '0:00';
     kDays.textContent = daysCount;
-    saveStateForWeek();
+
+    // حفظ تلقائي
+    await saveStateForWeek();
   }
 
-  function saveStateForWeek(){
-    const key = 'otCal-'+weekStartEl.value;
-    const payload = {
+  // ======= تخزين محلي/سحابي =======
+  function localKey(){ return 'otCal-'+weekKey(); }
+  function pickWeekPayload(){
+    return {
       baselineDay: baselineDayEl.value,
       baselineWeek: baselineWeekEl.value,
       defaultBreak: defaultBreakEl.value,
       days: [...document.querySelectorAll('.day')].map(card=>{
         const inputs = card.querySelectorAll('input');
-        return {key: card.dataset.day, date: card.dataset.date, start: inputs[0].value, end: inputs[1].value, breakMin: inputs[2].value};
+        return {key: card.dataset.day, date: card.dataset.date, start: inputs[0].value, end: inputs[1].value, breakMin: inputs[2].value };
       })
     };
-    localStorage.setItem(key, JSON.stringify(payload));
   }
 
-  function loadStateForWeek(){
-    const key = 'otCal-'+weekStartEl.value;
-    const raw = localStorage.getItem(key);
-    if(!raw) return;
+  async function saveStateForWeek(){
+    const payload = pickWeekPayload();
+    // محلي دائمًا
+    localStorage.setItem(localKey(), JSON.stringify(payload));
+
+    // سحابي إن كان المستخدم مسجلًا وFirebase جاهز
+    const user = firebaseReady ? auth.currentUser : null;
+    if(firebaseReady && user){
+      const ref = db.collection('users').doc(user.uid).collection('weeks').doc(weekKey());
+      await ref.set(payload, { merge:true });
+    }
+  }
+
+  async function loadStateForWeek(){
+    // تحميل محلي أولاً
+    const raw = localStorage.getItem(localKey());
+    if(raw){ applyPayload(JSON.parse(raw)); }
+
+    // لو في حساب، حمّل من Firestore ويغطي المحلي
+    const user = firebaseReady ? auth.currentUser : null;
+    if(firebaseReady && user){
+      const snap = await db.collection('users').doc(user.uid).collection('weeks').doc(weekKey()).get();
+      if(snap.exists){ applyPayload(snap.data()); }
+    }
+  }
+
+  function applyPayload(s){
     try{
-      const s = JSON.parse(raw);
       baselineDayEl.value = s.baselineDay ?? baselineDayEl.value;
       baselineWeekEl.value = s.baselineWeek ?? baselineWeekEl.value;
       defaultBreakEl.value = s.defaultBreak ?? defaultBreakEl.value;
       const map = new Map((s.days||[]).map(r=>[r.key,r]));
       document.querySelectorAll('.day').forEach(card=>{
         const r = map.get(card.dataset.day);
-        if(r){
-          const inputs = card.querySelectorAll('input');
-          inputs[0].value = r.start || '';
-          inputs[1].value = r.end || '';
-          inputs[2].value = r.breakMin ?? defaultBreakEl.value;
-        }
+        if(r){ const inputs = card.querySelectorAll('input'); inputs[0].value=r.start||''; inputs[1].value=r.end||''; inputs[2].value=r.breakMin ?? defaultBreakEl.value; }
       });
-    }catch(e){ console.warn('loadStateForWeek failed', e); }
+    }catch(e){ console.warn('applyPayload failed', e); }
   }
 
   function exportJSON(){
     const data = {
-      meta:{ app:'OT-Calendar', version:1, weekStart: weekStartEl.value, exportedAt: new Date().toISOString() },
-      baseline:{ day: baselineDayEl.value, week: baselineWeekEl.value },
-      days:[...document.querySelectorAll('.day')].map(card=>{
-        const inputs = card.querySelectorAll('input');
-        const d = getDayData(card);
-        return { key:card.dataset.day, date: card.dataset.date, start: inputs[0].value, end: inputs[1].value, breakMinutes: inputs[2].value, net: m2h(d.min), dailyOT: m2h(d.ot) };
-      })
+      meta:{ app:'Saaati', version:1, weekStart: weekKey(), exportedAt: new Date().toISOString() },
+      payload: pickWeekPayload(),
     };
     const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
     const url = URL.createObjectURL(blob); const a = document.createElement('a');
-    a.href=url; a.download = `week-${weekStartEl.value}.json`; a.click(); URL.revokeObjectURL(url);
+    a.href=url; a.download = `week-${weekKey()}.json`; a.click(); URL.revokeObjectURL(url);
   }
 
   function importJSONFile(file){
@@ -275,13 +387,7 @@
         const data = JSON.parse(fr.result);
         if(data.meta && data.meta.weekStart){ weekStartEl.value = data.meta.weekStart; }
         renderWeek();
-        if(data.baseline){ baselineDayEl.value = data.baseline.day ?? 8; baselineWeekEl.value = data.baseline.week ?? 40; }
-        const map = new Map((data.days||[]).map(r=>[r.key,r]));
-        document.querySelectorAll('.day').forEach(card=>{
-          const r = map.get(card.dataset.day);
-          if(r){ const inputs = card.querySelectorAll('input'); inputs[0].value=r.start||''; inputs[1].value=r.end||''; inputs[2].value=r.breakMinutes ?? defaultBreakEl.value; }
-        });
-        commit();
+        if(data.payload){ applyPayload(data.payload); commit(); }
       }catch(e){ alert('ملف غير صالح'); }
     };
     fr.readAsText(file);
@@ -289,7 +395,78 @@
 
   function setMondayOnPicker(date){ weekStartEl.value = fmtDate(startOfWeek(date)); }
 
-  // Listeners
+  // ======= حساب المستخدم (Firebase أو محلي معطّل) =======
+  function firstLetter(name){ return (name||'?').trim().charAt(0).toUpperCase() || '?' }
+  function setLoggedInUI(user){
+    if(user){
+      userBtn.textContent = user.displayName || user.email || 'الحساب';
+      avatar.style.display='flex';
+      avatar.textContent = firstLetter(user.displayName||user.email);
+      menuVerify.style.display = user.emailVerified ? 'none' : 'block';
+    }else{
+      userBtn.textContent = 'تسجيل الدخول';
+      avatar.style.display='none';
+      userMenu.classList.remove('open');
+    }
+  }else{
+      userBtn.textContent = 'تسجيل الدخول';
+      avatar.style.display='none';
+      userMenu.classList.remove('open');
+    }
+  }
+  function openAuth(){ authModal.classList.add('open'); authModal.setAttribute('aria-hidden','false'); authErr.textContent=''; }
+  function closeAuthModal(){ authModal.classList.remove('open'); authModal.setAttribute('aria-hidden','true'); }
+  function showErr(e){ authErr.textContent = e?.message || String(e); }
+
+  userBtn.addEventListener('click', (e)=>{ e.stopPropagation(); const user = firebaseReady? auth.currentUser:null; if(user){ userMenu.classList.toggle('open'); } else { openAuth(); } });
+  document.addEventListener('click', ()=> userMenu.classList.remove('open'));
+  closeAuth.addEventListener('click', closeAuthModal);
+
+  if(firebaseReady){
+    doSignUp.addEventListener('click', async()=>{
+      try{
+        const email = uEmail.value.trim(); const pass=uPass.value; const name=uName.value.trim();
+        if(!email || !pass) return showErr({message:'أدخل البريد وكلمة المرور'});
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        if(name) await cred.user.updateProfile({ displayName: name });
+        closeAuthModal(); setLoggedInUI(auth.currentUser); await renderWeek();
+      }catch(e){ showErr(e); }
+    });
+    doSignIn.addEventListener('click', async()=>{
+      try{
+        const email = uEmail.value.trim(); const pass=uPass.value;
+        if(!email || !pass) return showErr({message:'أدخل البريد وكلمة المرور'});
+        await auth.signInWithEmailAndPassword(email, pass);
+        closeAuthModal(); setLoggedInUI(auth.currentUser); await renderWeek();
+      }catch(e){ showErr(e); }
+    });
+    menuLogout.addEventListener('click', async(e)=>{ e.preventDefault(); await auth.signOut(); setLoggedInUI(null); renderWeek(); });
+    menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
+
+    auth.onAuthStateChanged(async(u)=>{
+      setLoggedInUI(u);
+      if(u){ await renderWeek(); }
+    });
+    // أزرار لوحة التحكم والتحقق وكلمة السر
+    menuDashboard.addEventListener('click', async(e)=>{ e.preventDefault(); userMenu.classList.remove('open'); await openDashboard(); });
+    menuVerify.addEventListener('click', async(e)=>{ e.preventDefault(); userMenu.classList.remove('open'); if(auth.currentUser && !auth.currentUser.emailVerified){ try{ await auth.currentUser.sendEmailVerification(); alert('أرسلنا لك رسالة تأكيد إلى بريدك.'); }catch(err){ alert(err.message); } } });
+    menuReset.addEventListener('click', async(e)=>{ e.preventDefault(); userMenu.classList.remove('open'); const email = auth.currentUser?.email || prompt('أدخل بريدك لإرسال رابط إعادة التعيين:'); if(!email) return; try{ await auth.sendPasswordResetEmail(email); alert('تم إرسال رابط إعادة تعيين كلمة السر.'); }catch(err){ alert(err.message); } });
+  } else {
+    // إن لم يكن Firebase مُعدًا، عطّل أزرار الدخول الفعلي
+    doSignUp.addEventListener('click', ()=> showErr({message:'فعّل Firebase في الكود لاستخدام التسجيل الحقيقي.'}));
+    doSignIn.addEventListener('click', ()=> showErr({message:'فعّل Firebase في الكود لاستخدام تسجيل الدخول.'}));
+    menuLogout.addEventListener('click', (e)=>{ e.preventDefault(); });
+    menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
+    menuDashboard.addEventListener('click', (e)=>{ e.preventDefault(); alert('اللوحة تحتاج Firebase لتقرأ الأسابيع من السحابة.'); });
+    menuVerify.addEventListener('click', (e)=>{ e.preventDefault(); alert('التأكيد يحتاج Firebase.'); });
+    menuReset.addEventListener('click', (e)=>{ e.preventDefault(); const email = prompt('أدخل بريدك لإرسال رابط إعادة التعيين (يتطلب Firebase):'); });
+  }));
+    doSignIn.addEventListener('click', ()=> showErr({message:'فعّل Firebase في الكود لاستخدام تسجيل الدخول.'}));
+    menuLogout.addEventListener('click', (e)=>{ e.preventDefault(); });
+    menuProfile.addEventListener('click', (e)=>{ e.preventDefault(); openAuth(); });
+  }
+
+  // ======= ربط الأحداث العامة =======
   [baselineDayEl, baselineWeekEl, defaultBreakEl].forEach(el=> el.addEventListener('input', commit));
   weekStartEl.addEventListener('change', renderWeek);
   btnPrev.addEventListener('click', ()=>{ const d = parseDate(weekStartEl.value); d.setDate(d.getDate()-7); weekStartEl.value = fmtDate(d); renderWeek(); });
@@ -299,7 +476,6 @@
   importBtn.addEventListener('click', ()=> fileInput.click());
   fileInput.addEventListener('change', ()=>{ if(fileInput.files && fileInput.files[0]) importJSONFile(fileInput.files[0]); });
   fillExampleBtn.addEventListener('click', ()=>{
-    // 07:00 → 17:30 مع استراحة 45
     document.querySelectorAll('.day').forEach((card,i)=>{
       const inputs = card.querySelectorAll('input');
       const preset = [
@@ -322,9 +498,105 @@
     commit();
   });
 
-  // Init — اضبط الأسبوع الحالي (الإثنين الأقرب)
-  setMondayOnPicker(new Date());
-  renderWeek();
+  // ======= لوحة الأسابيع =======
+  function openDashModal(){ dashModal.classList.add('open'); dashModal.setAttribute('aria-hidden','false'); }
+  function closeDashModal(){ dashModal.classList.remove('open'); dashModal.setAttribute('aria-hidden','true'); }
+  closeDash.addEventListener('click', closeDashModal);
+
+  async function openDashboard(){
+    if(!(firebaseReady && auth.currentUser)){ return alert('سجّل الدخول أولاً'); }
+    dashArea.innerHTML = '<p class="small">جارٍ التحميل...</p>';
+    openDashModal();
+    const list = await fetchWeeksList();
+    if(!list.length){ dashArea.innerHTML = '<p class="small">لا توجد أسابيع محفوظة بعد.</p>'; return; }
+    const table = document.createElement('table'); table.className='table';
+    table.innerHTML = '<thead><tr><th>الأسبوع يبدأ</th><th>إجمالي الساعات</th><th>إضافي</th><th>إجراءات</th></tr></thead><tbody></tbody>';
+    const tbody = table.querySelector('tbody');
+    list.forEach(item=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${item.id}</td><td>${item.total||'-'}</td><td>${item.ot||'-'}</td>`;
+      const tdAct = document.createElement('td');
+      const btnOpen = mkBtn('فتح','btn-sm'); btnOpen.onclick=()=>{ weekStartEl.value=item.id; closeDashModal(); renderWeek(); };
+      const btnJson = mkBtn('JSON','btn-sm'); btnJson.onclick=()=>downloadWeekJSON(item.id, item.data);
+      const btnPdf = mkBtn('PDF','btn-sm'); btnPdf.onclick=()=>downloadWeekPDF(item.id, item.data);
+      const btnDel = mkBtn('حذف','btn-sm'); btnDel.onclick=()=>deleteWeek(item.id);
+      tdAct.append(btnOpen, btnJson, btnPdf, btnDel); tr.appendChild(tdAct); tbody.appendChild(tr);
+    });
+    dashArea.innerHTML=''; dashArea.appendChild(table);
+  }
+
+  function mkBtn(txt, cls){ const b=document.createElement('button'); b.textContent=txt; b.className=cls; return b }
+
+  async function fetchWeeksList(){
+    const out=[]; const ref = db.collection('users').doc(auth.currentUser.uid).collection('weeks');
+    const snap = await ref.get();
+    snap.forEach(doc=>{
+      const data = doc.data()||{}; // حساب سريع للمجموع/الإضافي من الحقول المخزنة
+      const totals = sumWeekFromPayload(data);
+      out.push({ id: doc.id, data, total: totals.total, ot: totals.ot });
+    });
+    // رتب تنازليًا حسب التاريخ النصي
+    out.sort((a,b)=> a.id < b.id ? 1 : -1);
+    return out;
+  }
+
+  function sumWeekFromPayload(payload){
+    try{
+      const baseWeekMin = Math.round(parseFloat((payload.baselineWeek??40))*60);
+      let totalMin=0; (payload.days||[]).forEach(d=>{ if(d.start && d.end){ let sm=h2m(d.start), em=h2m(d.end); if(em<sm) em+=1440; const br=parseInt(d.breakMin||0,10); totalMin += Math.max(0,(em-sm)-br); } });
+      return { total: m2h(totalMin), ot: m2h(Math.max(0,totalMin-baseWeekMin)) };
+    }catch{ return { total:'-', ot:'-' } }
+  }
+
+  async function deleteWeek(id){
+    if(!confirm('تأكيد حذف الأسبوع '+id+'؟')) return;
+    try{
+      await db.collection('users').doc(auth.currentUser.uid).collection('weeks').doc(id).delete();
+      localStorage.removeItem('otCal-'+id);
+      await openDashboard();
+    }catch(e){ alert(e.message); }
+  }
+
+  function downloadWeekJSON(id, payload){
+    const data = { meta:{ app:'Saaati', version:1, weekStart:id, exportedAt:new Date().toISOString() }, payload };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href=url; a.download = `week-${id}.json`; a.click(); URL.revokeObjectURL(url);
+  }
+
+  function downloadWeekPDF(id, payload){
+    try{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation:'p', unit:'pt', format:'a4' });
+      const pad=40; let y=pad; const line= (txt)=>{ doc.text(String(txt), pad, y); y+=18; };
+      doc.setFontSize(16); doc.text('تقرير أسبوع العمل — '+id, pad, y); y+=26; doc.setFontSize(12);
+      line('الأساس اليومي: '+(payload.baselineDay||'—')+' ساعة');
+      line('الأساس الأسبوعي: '+(payload.baselineWeek||'—')+' ساعة');
+      line('استراحة افتراضية: '+(payload.defaultBreak||0)+' دقيقة'); y+=10;
+      doc.text('الأيام:', pad, y); y+=16;
+      (payload.days||[]).forEach(d=>{ line(`${d.key} (${d.date}) — ${d.start||'—'} → ${d.end||'—'} | استراحة ${d.breakMin||0}د`); });
+      const sums = sumWeekFromPayload(payload);
+      y+=10; line('الإجمالي: '+sums.total+' — الإضافي: '+sums.ot);
+      doc.save(`week-${id}.pdf`);
+    }catch(e){ alert('تعذّر إنشاء PDF: '+e.message); }
+  }
+      inputs[0].value=''; inputs[1].value=''; inputs[2].value=defaultBreakEl.value;
+    });
+    commit();
+  });
+
+  // Init — الإثنين الأقرب
+  function initWeek(){ setMondayOnPicker(new Date()); renderWeek(); }
+  initWeek();
 })();
-</script></body>
+</script><!-- ===== Firestore Security Rules (انسخها في قسم Rules) =====
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/weeks/{weekKey} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}
+--></body>
 </html>
