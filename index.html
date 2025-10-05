@@ -254,6 +254,8 @@ function exportMonthJSON(){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);
 }
 
+function openExport(){ exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false'); }
+
 // Navigation
 function showCard(card){ [dayCard, settingsCard].forEach(el=> el.style.display='none'); card.style.display='block'; }
 navDay.onclick=()=> showCard(dayCard);
