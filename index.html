@@ -2,307 +2,270 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>حاسبة الساعات والإضافي | ألمانيا</title>
+  <title>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</title>
   <style>
-    :root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --accent:#22c55e; --danger:#ef4444; --ok:#60a5fa; --text:#e5e7eb; }
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Naskh Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{max-width:980px;margin:24px auto;padding:16px}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:16px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
-    h1{font-size:clamp(20px,3vw,28px);margin:0 0 8px}
-    h2{font-size:18px;margin:16px 0 8px;color:#cbd5e1}
+    :root{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}
+    .wrap{max-width:1060px;margin:24px auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    h1{margin:0 0 8px;font-size:clamp(20px,3vw,28px)}
+    p.small{color:var(--muted);margin:0 0 12px}
     .row{display:flex;gap:12px;flex-wrap:wrap}
-    .col{flex:1 1 200px}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #233044;background:#0b1220;color:var(--text)}
-    input[type="time"], input[type="number"]{direction:ltr}
-    button{cursor:pointer;border:1px solid #2b394f}
+    .col{flex:1 1 220px}
+    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink)}
+    input[type="time"], input[type="date"], input[type="number"]{direction:ltr}
+    button{cursor:pointer}
     .primary{background:linear-gradient(180deg,#16a34a,#15803d);border:none}
     .ghost{background:transparent}
-    .small{font-size:12px;color:var(--muted)}
-    table{width:100%;border-collapse:separate;border-spacing:0 8px}
-    th,td{padding:10px 12px;text-align:center}
-    thead th{font-size:12px;color:#93a4b9}
-    tbody tr{background:#0b1220;border:1px solid #202b40}
-    tbody td:first-child, thead th:first-child{border-radius:10px 0 0 10px}
-    tbody td:last-child, thead th:last-child{border-radius:0 10px 10px 0}
-    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1220;border:1px solid #1f2b40;color:#e5e7eb}
-    .tag.ok{border-color:#14532d}
-    .tag.warn{border-color:#7f1d1d}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:700px){ .grid2{grid-template-columns:1fr} }
-    .foot{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:8px}
-    .muted{color:var(--muted)}
-    .pill{padding:8px 12px;border-radius:999px;background:#0b1220;border:1px solid #26334a}
-    .kpi{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-top:10px}
-    .kpi .card-mini{background:#0b1220;border:1px solid #1f2b40;border-radius:12px;padding:12px;text-align:center}
-    .kpi h3{margin:0;font-size:14px;color:#cbd5e1}
-    .kpi .val{font-size:20px;font-weight:700;margin-top:6px}
-    .sep{height:1px;background:#1f2937;margin:16px 0}
+    .muted{color:var(--muted)}/* تقويم أسبوعي */
+.weekbar{display:flex;align-items:center;gap:8px;margin:8px 0 12px}
+.btn{padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#0a1222;color:var(--ink)}
+.btn:disabled{opacity:.6}
+.pill{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#0a1222}
+
+.calendar{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+@media (max-width:900px){.calendar{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:560px){.calendar{grid-template-columns:1fr}}
+
+.day{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);background:#0a1222;border-radius:14px;padding:12px}
+.dayHeader{display:flex;justify-content:space-between;align-items:center}
+.title{font-weight:700}
+.badge{font-size:12px;color:var(--muted);border:1px dashed var(--line);padding:4px 8px;border-radius:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-size:12px;border:1px solid var(--line);padding:6px 10px;border-radius:999px}
+.tag.ok{border-color:#14532d}
+.tag.warn{border-color:#7f1d1d}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:10px;margin-top:8px}
+.kcard{border:1px solid var(--line);background:#0a1222;border-radius:12px;padding:12px;text-align:center}
+.kcard h3{margin:0;color:var(--muted);font-size:12px}
+.kcard .val{font-size:20px;font-weight:700;margin-top:6px}
+.sep{height:1px;background:var(--line);margin:14px 0}
+
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>حاسبة الساعات والإضافي (Überstunden) — ألمانيا</h1>
-      <p class="small">أدخل أوقاتك لكل يوم (الإفتراضي 5 أيام عمل). الحاسبة تخصم الاستراحة، وتحسب الساعات اليومية والأسبوعية، وتُظهر الإضافي فوق 40 ساعة/الأسبوع وفوق 8 ساعات/اليوم.</p><div class="grid2">
+      <h1>حاسبة الدوام والإضافي — عرض أسبوعي مثل الرزنامة</h1>
+      <p class="small">واجهة بسيطة تشبه الرزنامة: لكل يوم بطاقة مستقلة تدخل فيها <strong>وقت البدء</strong> و<strong>وقت الانتهاء</strong> و<strong>الاستراحة (دقائق)</strong>. الحاسبة تخصم الاستراحة وتعرض الصافي والإضافي لكل يوم، مع ملخص أسبوعي.</p><div class="row">
     <div class="col">
-      <h2>الإعدادات الأساسية</h2>
-      <div class="row">
-        <div class="col">
-          <label>الأساس اليومي (ساعات)</label>
-          <input id="baselineDay" type="number" min="0" step="0.25" value="8">
-        </div>
-        <div class="col">
-          <label>الأساس الأسبوعي (ساعات)</label>
-          <input id="baselineWeek" type="number" min="0" step="0.5" value="40">
-        </div>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <div class="col">
-          <label>نمط الوقت</label>
-          <select id="timeMode">
-            <option value="de">24-ساعة (أوروبا/ألمانيا)</option>
-          </select>
-        </div>
-        <div class="col">
-          <label>استراحة افتراضية (دقائق)</label>
-          <input id="defaultBreak" type="number" min="0" step="5" value="30">
-        </div>
-      </div>
-      <div class="sep"></div>
-      <div class="row">
-        <div class="col">
-          <button class="ghost" id="fillExample">تعبئة مثال: 07:00 → 17:30</button>
-        </div>
-        <div class="col">
-          <button class="ghost" id="clearAll">مسح الكل</button>
-        </div>
-      </div>
+      <label>ابدأ من أسبوع (اختر تاريخ يوم الاثنين)</label>
+      <input type="date" id="weekStart" />
     </div>
     <div class="col">
-      <h2>ملخص سريع</h2>
-      <div class="kpi">
-        <div class="card-mini"><h3>مجموع الأسبوع</h3><div class="val" id="kTotal">0:00</div></div>
-        <div class="card-mini"><h3>إضافي أسبوعي</h3><div class="val" id="kOTWeek">0:00</div></div>
-        <div class="card-mini"><h3>معدل اليوم</h3><div class="val" id="kAvg">0:00</div></div>
-        <div class="card-mini"><h3>أيام مُدخلة</h3><div class="val" id="kDays">0</div></div>
-      </div>
+      <label>الأساس اليومي (ساعات)</label>
+      <input id="baselineDay" type="number" min="0" step="0.25" value="8" />
+    </div>
+    <div class="col">
+      <label>الأساس الأسبوعي (ساعات)</label>
+      <input id="baselineWeek" type="number" min="0" step="0.5" value="40" />
+    </div>
+    <div class="col">
+      <label>استراحة افتراضية (دقائق)</label>
+      <input id="defaultBreak" type="number" min="0" step="5" value="30" />
     </div>
   </div>
 
-  <h2>أيام الأسبوع</h2>
-  <div class="foot">
-    <span class="muted">* السبت اختياري. يمكنك ترك أي يوم فارغ إذا لم تعمل.</span>
-    <span class="pill" id="weekInfo">الأساس الأسبوعي: 40:00</span>
+  <div class="weekbar">
+    <button class="btn" id="prevWeek">⟵ الأسبوع السابق</button>
+    <span class="pill" id="rangeLbl">—</span>
+    <button class="btn" id="nextWeek">الأسبوع التالي ⟶</button>
+    <span class="muted" style="margin-inline-start:auto">* السبت اختياري</span>
   </div>
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>اليوم</th>
-          <th>البدء</th>
-          <th>الانتهاء</th>
-          <th>الاستراحة (د)</th>
-          <th>الصافي (س)</th>
-          <th>إضافي يومي</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="sep"></div>
+  <div class="kpis">
+    <div class="kcard"><h3>مجموع الأسبوع</h3><div class="val" id="kTotal">0:00</div></div>
+    <div class="kcard"><h3>إضافي أسبوعي</h3><div class="val" id="kOTWeek">0:00</div></div>
+    <div class="kcard"><h3>معدل اليوم (المدخل)</h3><div class="val" id="kAvg">0:00</div></div>
+    <div class="kcard"><h3>أيام مدخلة</h3><div class="val" id="kDays">0</div></div>
   </div>
 
   <div class="sep"></div>
   <div class="row">
-    <div class="col">
-      <button class="primary" id="exportJson">تصدير الأسبوع (JSON)</button>
-    </div>
-    <div class="col">
-      <button class="ghost" id="importJson">استيراد أسبوع</button>
-      <input id="fileInput" type="file" accept="application/json" style="display:none" />
-    </div>
+    <div class="col"><button class="ghost" id="fillExample">تعبئة مثال 07:00→17:30 (استراحة 45)</button></div>
+    <div class="col"><button class="ghost" id="clearAll">مسح هذا الأسبوع</button></div>
+    <div class="col"><button class="primary" id="exportJson">تصدير الأسبوع (JSON)</button></div>
+    <div class="col"><button class="ghost" id="importJson">استيراد أسبوع</button><input id="fileInput" type="file" accept="application/json" style="display:none"></div>
   </div>
-
 </div>
 
   </div><script>
 (function(){
   const days = [
-    { key:'mon', label:'الاثنين' },
-    { key:'tue', label:'الثلاثاء' },
-    { key:'wed', label:'الأربعاء' },
-    { key:'thu', label:'الخميس' },
-    { key:'fri', label:'الجمعة' },
-    { key:'sat', label:'السبت (اختياري)' },
+    {key:'mon', name:'الاثنين', offset:0},
+    {key:'tue', name:'الثلاثاء', offset:1},
+    {key:'wed', name:'الأربعاء', offset:2},
+    {key:'thu', name:'الخميس', offset:3},
+    {key:'fri', name:'الجمعة', offset:4},
+    {key:'sat', name:'السبت (اختياري)', offset:5},
   ];
 
-  const tbody = document.getElementById('tbody');
+  const cal = document.getElementById('calendar');
+  const weekStartEl = document.getElementById('weekStart');
+  const rangeLbl = document.getElementById('rangeLbl');
+  const btnPrev = document.getElementById('prevWeek');
+  const btnNext = document.getElementById('nextWeek');
+
   const baselineDayEl = document.getElementById('baselineDay');
   const baselineWeekEl = document.getElementById('baselineWeek');
   const defaultBreakEl = document.getElementById('defaultBreak');
+
   const kTotal = document.getElementById('kTotal');
   const kOTWeek = document.getElementById('kOTWeek');
   const kAvg = document.getElementById('kAvg');
   const kDays = document.getElementById('kDays');
-  const weekInfo = document.getElementById('weekInfo');
 
-  const fillExampleBtn = document.getElementById('fillExample');
-  const clearAllBtn = document.getElementById('clearAll');
   const exportBtn = document.getElementById('exportJson');
   const importBtn = document.getElementById('importJson');
   const fileInput = document.getElementById('fileInput');
+  const fillExampleBtn = document.getElementById('fillExample');
+  const clearAllBtn = document.getElementById('clearAll');
 
-  function h2m(h){
-    const [HH, MM] = h.split(':').map(Number);
-    return (HH*60 + (MM||0));
+  function fmtDate(d){return d.toISOString().slice(0,10)}
+  function parseDate(str){ const [y,m,da]=str.split('-').map(Number); return new Date(y,m-1,da) }
+
+  function startOfWeek(date){
+    // اجعل الإثنين بداية الأسبوع حسب ألمانيا
+    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const day = (d.getDay()+6)%7; // 0=Mon,6=Sun
+    d.setDate(d.getDate() - day);
+    return d;
   }
-  function m2h(m){
-    const sign = m < 0 ? '-' : '';
-    m = Math.abs(m);
-    const hh = Math.floor(m/60);
-    const mm = Math.round(m%60);
-    return `${sign}${hh}:${mm.toString().padStart(2,'0')}`;
-  }
+
+  function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d }
+
+  function h2m(h){ if(!h) return 0; const [HH,MM]=h.split(':').map(Number); return HH*60+(MM||0) }
+  function m2h(m){ const sign=m<0?'-':''; m=Math.abs(m); const hh=Math.floor(m/60); const mm=Math.round(m%60); return `${sign}${hh}:${mm.toString().padStart(2,'0')}` }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
-  function buildRow(d){
-    const tr = document.createElement('tr');
-    tr.dataset.key = d.key;
+  function buildDayCard(dayObj, weekStart){
+    const d = addDays(weekStart, dayObj.offset);
+    const id = dayObj.key;
 
-    const tdDay = document.createElement('td');
-    tdDay.textContent = d.label;
+    const wrap = document.createElement('div'); wrap.className='day'; wrap.dataset.day=id; wrap.dataset.date=fmtDate(d);
 
-    const tdStart = document.createElement('td');
-    const start = document.createElement('input');
-    start.type = 'time'; start.value = '';
-    start.placeholder = 'hh:mm';
+    const header = document.createElement('div'); header.className='dayHeader';
+    const title = document.createElement('div'); title.className='title'; title.textContent = dayObj.name;
+    const badge = document.createElement('div'); badge.className='badge'; badge.textContent = d.toLocaleDateString('de-DE');
+    header.appendChild(title); header.appendChild(badge);
 
-    const tdEnd = document.createElement('td');
-    const end = document.createElement('input');
-    end.type = 'time'; end.value = '';
+    const grid = document.createElement('div'); grid.className='grid';
+    const s = document.createElement('input'); s.type='time'; s.placeholder='ابدأ';
+    const e = document.createElement('input'); e.type='time'; e.placeholder='انتهِ';
+    const b = document.createElement('input'); b.type='number'; b.min=0; b.step=5; b.value=defaultBreakEl.value; b.title='استراحة (دقائق)';
+    const bLbl = document.createElement('label'); bLbl.textContent='استراحة (د)'; bLbl.style.fontSize='12px'; bLbl.style.color='#94a3b8';
 
-    const tdBreak = document.createElement('td');
-    const brk = document.createElement('input');
-    brk.type = 'number'; brk.min = 0; brk.step = 5; brk.value = defaultBreakEl.value;
+    const bWrap = document.createElement('div'); bWrap.style.display='flex'; bWrap.style.flexDirection='column'; bWrap.appendChild(bLbl); bWrap.appendChild(b);
 
-    const tdNet = document.createElement('td');
-    const net = document.createElement('span'); net.className = 'tag ok'; net.textContent = '0:00';
+    grid.appendChild(s); grid.appendChild(e); grid.appendChild(bWrap);
 
-    const tdOT = document.createElement('td');
-    const ot = document.createElement('span'); ot.className = 'tag'; ot.textContent = '0:00';
+    const kpi = document.createElement('div'); kpi.className='kpi';
+    const net = document.createElement('span'); net.className='tag ok'; net.textContent='الصافي: 0:00';
+    const ot = document.createElement('span'); ot.className='tag'; ot.textContent='إضافي: 0:00';
+    kpi.appendChild(net); kpi.appendChild(ot);
 
-    [start,end,brk].forEach(el=>el.addEventListener('input', commit));
+    [s,e,b].forEach(el=> el.addEventListener('input', commit));
 
-    tdStart.appendChild(start); tdEnd.appendChild(end); tdBreak.appendChild(brk);
-    tdNet.appendChild(net); tdOT.appendChild(ot);
-
-    tr.appendChild(tdDay); tr.appendChild(tdStart); tr.appendChild(tdEnd); tr.appendChild(tdBreak); tr.appendChild(tdNet); tr.appendChild(tdOT);
-
-    return tr;
+    wrap.appendChild(header); wrap.appendChild(grid); wrap.appendChild(kpi);
+    return wrap;
   }
 
-  function getRowData(tr){
-    const [start,end,brk] = [...tr.querySelectorAll('input')];
-    const has = start.value && end.value;
-    if(!has) return { minutes:0, ot:0, valid:false };
+  function renderWeek(){
+    cal.innerHTML='';
+    const start = parseDate(weekStartEl.value);
+    const end = addDays(start,5);
+    rangeLbl.textContent = `${start.toLocaleDateString('de-DE')} — ${end.toLocaleDateString('de-DE')}`;
+    days.forEach(d=> cal.appendChild(buildDayCard(d, start)));
+    // بعد بناء الواجهة، حمّل حالة الأسبوع إن وجدت
+    loadStateForWeek();
+    commit();
+  }
 
-    let s = h2m(start.value);
-    let e = h2m(end.value);
-
-    // دعم الشفتات التي تنتهي بعد منتصف الليل (مثلاً 22:00 → 05:00)
-    if(e < s) e += 24*60;
-
-    const breakMin = clamp(parseInt(brk.value||0,10),0,600);
-    const total = Math.max(0, (e - s) - breakMin);
-
-    const baseDay = Math.round(parseFloat(baselineDayEl.value||8)*60);
-    const ot = Math.max(0, total - baseDay);
-
-    return { minutes: total, ot, valid:true };
+  function getDayData(card){
+    const inputs = card.querySelectorAll('input');
+    const s = inputs[0].value; const e = inputs[1].value; const br = clamp(parseInt(inputs[2].value||0,10),0,600);
+    if(!s || !e) return {min:0, ot:0, valid:false};
+    let sm = h2m(s); let em = h2m(e); if(em < sm) em += 24*60; // عبور منتصف الليل
+    const total = Math.max(0, (em - sm) - br);
+    const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
+    const ot = Math.max(0, total - baseDayMin);
+    return {min:total, ot, valid:true};
   }
 
   function commit(){
-    // حدث على أي تغيير
-    let totalWeek = 0; let daysCount = 0; let otWeek=0; const baseDayMin = Math.round(parseFloat(baselineDayEl.value||8)*60);
-
-    [...tbody.querySelectorAll('tr')].forEach(tr=>{
-      const data = getRowData(tr);
-      const net = tr.querySelector('td:nth-child(5) span');
-      const ot = tr.querySelector('td:nth-child(6) span');
-
-      net.textContent = m2h(data.minutes);
-      ot.textContent = m2h(data.ot);
-      ot.className = 'tag ' + (data.ot>0 ? 'warn' : 'ok');
-
-      if(data.valid){
-        totalWeek += data.minutes;
-        otWeek += data.ot;
-        daysCount += 1;
-      }
+    let total=0, daysCount=0, otWeek=0;
+    document.querySelectorAll('.day').forEach(card=>{
+      const d = getDayData(card);
+      const [netEl, otEl] = card.querySelectorAll('.tag');
+      netEl.textContent = `الصافي: ${m2h(d.min)}`;
+      otEl.textContent = `إضافي: ${m2h(d.ot)}`;
+      otEl.className = 'tag ' + (d.ot>0? 'warn':'ok');
+      if(d.valid){ total += d.min; otWeek += d.ot; daysCount++; }
     });
-
     const baseWeekMin = Math.round(parseFloat(baselineWeekEl.value||40)*60);
-
-    kTotal.textContent = m2h(totalWeek);
-    const weekExtra = Math.max(0, totalWeek - baseWeekMin);
-    kOTWeek.textContent = m2h(weekExtra);
-    kAvg.textContent = daysCount? m2h(Math.round(totalWeek/daysCount)) : '0:00';
+    kTotal.textContent = m2h(total);
+    kOTWeek.textContent = m2h(Math.max(0,total-baseWeekMin));
+    kAvg.textContent = daysCount? m2h(Math.round(total/daysCount)) : '0:00';
     kDays.textContent = daysCount;
-
-    weekInfo.textContent = `الأساس الأسبوعي: ${m2h(baseWeekMin)}`;
-
-    // حفظ تلقائي بسيط في localStorage
-    saveState();
+    saveStateForWeek();
   }
 
-  function saveState(){
-    const state = {
+  function saveStateForWeek(){
+    const key = 'otCal-'+weekStartEl.value;
+    const payload = {
       baselineDay: baselineDayEl.value,
       baselineWeek: baselineWeekEl.value,
       defaultBreak: defaultBreakEl.value,
-      rows: [...tbody.querySelectorAll('tr')].map(tr=>{
-        const [start,end,brk] = [...tr.querySelectorAll('input')];
-        return { day: tr.dataset.key, start:start.value, end:end.value, brk:brk.value };
+      days: [...document.querySelectorAll('.day')].map(card=>{
+        const inputs = card.querySelectorAll('input');
+        return {key: card.dataset.day, date: card.dataset.date, start: inputs[0].value, end: inputs[1].value, breakMin: inputs[2].value};
       })
     };
-    localStorage.setItem('otState', JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify(payload));
   }
 
-  function loadState(){
-    const raw = localStorage.getItem('otState');
+  function loadStateForWeek(){
+    const key = 'otCal-'+weekStartEl.value;
+    const raw = localStorage.getItem(key);
     if(!raw) return;
     try{
       const s = JSON.parse(raw);
-      baselineDayEl.value = s.baselineDay ?? 8;
-      baselineWeekEl.value = s.baselineWeek ?? 40;
-      defaultBreakEl.value = s.defaultBreak ?? 30;
-      const map = new Map((s.rows||[]).map(r=>[r.day,r]));
-      [...tbody.querySelectorAll('tr')].forEach(tr=>{
-        const r = map.get(tr.dataset.key);
+      baselineDayEl.value = s.baselineDay ?? baselineDayEl.value;
+      baselineWeekEl.value = s.baselineWeek ?? baselineWeekEl.value;
+      defaultBreakEl.value = s.defaultBreak ?? defaultBreakEl.value;
+      const map = new Map((s.days||[]).map(r=>[r.key,r]));
+      document.querySelectorAll('.day').forEach(card=>{
+        const r = map.get(card.dataset.day);
         if(r){
-          const [start,end,brk] = [...tr.querySelectorAll('input')];
-          start.value = r.start || '';
-          end.value = r.end || '';
-          brk.value = r.brk ?? defaultBreakEl.value;
+          const inputs = card.querySelectorAll('input');
+          inputs[0].value = r.start || '';
+          inputs[1].value = r.end || '';
+          inputs[2].value = r.breakMin ?? defaultBreakEl.value;
         }
       });
-    }catch(e){ console.warn('Failed to load state', e); }
+    }catch(e){ console.warn('loadStateForWeek failed', e); }
   }
 
   function exportJSON(){
     const data = {
-      meta: { app:"OT-Calc-DE", version:1, exportedAt: new Date().toISOString() },
-      baseline: { day: baselineDayEl.value, week: baselineWeekEl.value },
-      days: [...tbody.querySelectorAll('tr')].map(tr=>{
-        const [start,end,brk] = [...tr.querySelectorAll('input')];
-        const d = getRowData(tr);
-        return { key: tr.dataset.key, start:start.value, end:end.value, breakMinutes: brk.value, net: m2h(d.minutes), dailyOT: m2h(d.ot) };
+      meta:{ app:'OT-Calendar', version:1, weekStart: weekStartEl.value, exportedAt: new Date().toISOString() },
+      baseline:{ day: baselineDayEl.value, week: baselineWeekEl.value },
+      days:[...document.querySelectorAll('.day')].map(card=>{
+        const inputs = card.querySelectorAll('input');
+        const d = getDayData(card);
+        return { key:card.dataset.day, date: card.dataset.date, start: inputs[0].value, end: inputs[1].value, breakMinutes: inputs[2].value, net: m2h(d.min), dailyOT: m2h(d.ot) };
       })
     };
     const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'week-ot.json'; a.click();
-    URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href=url; a.download = `week-${weekStartEl.value}.json`; a.click(); URL.revokeObjectURL(url);
   }
 
   function importJSONFile(file){
@@ -310,19 +273,13 @@
     fr.onload = ()=>{
       try{
         const data = JSON.parse(fr.result);
-        if(data.baseline){
-          baselineDayEl.value = data.baseline.day ?? 8;
-          baselineWeekEl.value = data.baseline.week ?? 40;
-        }
+        if(data.meta && data.meta.weekStart){ weekStartEl.value = data.meta.weekStart; }
+        renderWeek();
+        if(data.baseline){ baselineDayEl.value = data.baseline.day ?? 8; baselineWeekEl.value = data.baseline.week ?? 40; }
         const map = new Map((data.days||[]).map(r=>[r.key,r]));
-        [...tbody.querySelectorAll('tr')].forEach(tr=>{
-          const r = map.get(tr.dataset.key);
-          if(r){
-            const [start,end,brk] = [...tr.querySelectorAll('input')];
-            start.value = r.start || '';
-            end.value = r.end || '';
-            brk.value = r.breakMinutes ?? defaultBreakEl.value;
-          }
+        document.querySelectorAll('.day').forEach(card=>{
+          const r = map.get(card.dataset.day);
+          if(r){ const inputs = card.querySelectorAll('input'); inputs[0].value=r.start||''; inputs[1].value=r.end||''; inputs[2].value=r.breakMinutes ?? defaultBreakEl.value; }
         });
         commit();
       }catch(e){ alert('ملف غير صالح'); }
@@ -330,51 +287,44 @@
     fr.readAsText(file);
   }
 
-  // Build table
-  days.forEach(d=> tbody.appendChild(buildRow(d)) );
+  function setMondayOnPicker(date){ weekStartEl.value = fmtDate(startOfWeek(date)); }
 
   // Listeners
-  [baselineDayEl, baselineWeekEl, defaultBreakEl].forEach(el=> el.addEventListener('input', ()=>{
-    // تحديث الاستراحة الافتراضية لا يُغير المُدخلات الحالية تلقائياً
-    commit();
-  }));
-
-  fillExampleBtn.addEventListener('click', ()=>{
-    const ex = [
-      {k:'mon', s:'07:00', e:'17:30', b:30},
-      {k:'tue', s:'07:00', e:'17:00', b:30},
-      {k:'wed', s:'07:00', e:'16:00', b:30},
-      {k:'thu', s:'07:30', e:'15:30', b:30},
-      {k:'fri', s:'06:00', e:'14:30', b:30},
-      {k:'sat', s:'', e:'', b:30},
-    ];
-    ex.forEach(r=>{
-      const tr = [...tbody.querySelectorAll('tr')].find(x=>x.dataset.key===r.k);
-      if(tr){
-        const [start,end,brk] = [...tr.querySelectorAll('input')];
-        start.value = r.s; end.value = r.e; brk.value = r.b;
-      }
-    });
-    commit();
-  });
-
-  clearAllBtn.addEventListener('click', ()=>{
-    [...tbody.querySelectorAll('tr')].forEach(tr=>{
-      const [start,end,brk] = [...tr.querySelectorAll('input')];
-      start.value = ''; end.value = ''; brk.value = defaultBreakEl.value;
-    });
-    commit();
-  });
+  [baselineDayEl, baselineWeekEl, defaultBreakEl].forEach(el=> el.addEventListener('input', commit));
+  weekStartEl.addEventListener('change', renderWeek);
+  btnPrev.addEventListener('click', ()=>{ const d = parseDate(weekStartEl.value); d.setDate(d.getDate()-7); weekStartEl.value = fmtDate(d); renderWeek(); });
+  btnNext.addEventListener('click', ()=>{ const d = parseDate(weekStartEl.value); d.setDate(d.getDate()+7); weekStartEl.value = fmtDate(d); renderWeek(); });
 
   exportBtn.addEventListener('click', exportJSON);
   importBtn.addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', ()=>{
-    if(fileInput.files && fileInput.files[0]) importJSONFile(fileInput.files[0]);
+  fileInput.addEventListener('change', ()=>{ if(fileInput.files && fileInput.files[0]) importJSONFile(fileInput.files[0]); });
+  fillExampleBtn.addEventListener('click', ()=>{
+    // 07:00 → 17:30 مع استراحة 45
+    document.querySelectorAll('.day').forEach((card,i)=>{
+      const inputs = card.querySelectorAll('input');
+      const preset = [
+        ['07:00','17:30',45],
+        ['07:00','17:00',30],
+        ['07:00','16:00',30],
+        ['07:30','15:30',30],
+        ['06:00','14:30',30],
+        ['', '', 30],
+      ][i] || ['', '', 30];
+      inputs[0].value=preset[0]; inputs[1].value=preset[1]; inputs[2].value=preset[2];
+    });
+    commit();
+  });
+  clearAllBtn.addEventListener('click', ()=>{
+    document.querySelectorAll('.day').forEach(card=>{
+      const inputs = card.querySelectorAll('input');
+      inputs[0].value=''; inputs[1].value=''; inputs[2].value=defaultBreakEl.value;
+    });
+    commit();
   });
 
-  // Initialize
-  loadState();
-  commit();
+  // Init — اضبط الأسبوع الحالي (الإثنين الأقرب)
+  setMondayOnPicker(new Date());
+  renderWeek();
 })();
 </script></body>
 </html>
