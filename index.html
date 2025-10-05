@@ -1,4 +1,3 @@
-
 <!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
@@ -8,7 +7,7 @@
 :root{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--ok:#16a34a;--warn:#ef4444;--accent:#3b82f6}
 .dark{--bg:#0b1020;--card:#0e1528;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2b40;--ok:#16a34a;--warn:#ef4444;--accent:#60a5fa}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}/* Topbar */ .topbar{position:sticky;top:0;z-index:20;background:#ffffffcc;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)} .dark .topbar{background:#0c1426cc} .topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none} .topbar .inner::-webkit-scrollbar{display:none} .brand{font-weight:800;flex-shrink:0} .btn-sm{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;flex-shrink:0;white-space:nowrap;height:36px} select.lang{height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:0 10px} .flag{font-size:18px;margin-inline-start:4px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Naskh Arabic",Tahoma,Arial,sans-serif}/* Topbar */ .topbar{position:sticky;top:0;z-index:20;background:#ffffffcc;backdrop-filter:blur(6px);border-bottom:1px solid var(--line)} .dark .topbar{background:#0c1426cc} .topbar .inner{max-width:1060px;margin:0 auto;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none} .topbar .inner::-webkit-scrollbar{display:none} .brand{font-weight:800;flex-shrink:0} .btn-sm{padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;flex-shrink:0;white-space:nowrap;height:36px} select.lang{height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:0 10px}
 
 /* Containers */ .wrap{max-width:860px;margin:24px auto;padding:16px} .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 26px rgba(15, 23, 42, .06)} h1{margin:0 0 8px;font-size:22px} p.small{color:var(--muted);margin:0 0 12px}
 
@@ -27,13 +26,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
     <button id="navDay"      class="btn-sm">اليوم</button>
     <button id="navMonth"    class="btn-sm">الشهري</button>
     <button id="navSettings" class="btn-sm">الإعدادات</button>
-    <button id="navExport"   class="btn-sm">تصدير</button>
+    <button id="navExport"   class="btn-sm">📦 تصدير</button>
     <select id="langSel" class="lang" title="Language">
       <option value="ar">العربية</option>
       <option value="en">English</option>
       <option value="de">Deutsch</option>
     </select>
-    <span id="langFlag" class="flag">🇸🇦</span>
     <button id="themeBtn"    class="btn-sm">Dark</button>
   </div>
 </div><div class="wrap">
@@ -101,9 +99,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
     <div class="actions"><button id="closeMonth" class="btn-sm">إغلاق</button></div>
   </div>
 </div><!-- Export modal --><div id="exportModal" class="modal" aria-hidden="true">
-  <div class="dialog" style="max-width:540px">
+  <div class="dialog" style="max-width:520px">
     <h2 id="titleExport">تصدير</h2>
-    <div id="expLangHint" class="small" style="margin:6px 0 12px"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div>
         <label id="lblScope">النطاق</label>
@@ -125,27 +122,25 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto 
       <button id="doExport" class="btn-sm">تصدير</button>
     </div>
   </div>
-</div><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script><script>
+</div><!-- libs: html2canvas فقط للصورة --><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script><script>
 // ===== I18N =====
 const I18N = {
-  ar:{dir:'rtl',brand:'ساعتي',nav:{day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير'},themeLight:'داكن',themeDark:'فاتح',day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم الحالي',optMonth:'الشهر المختار',cancel:'إلغاء',do:'تصدير',hint:'سيتم التصدير باللغة:'}},
-  en:{dir:'ltr',brand:'Saaati',nav:{day:'Day',month:'Monthly',settings:'Settings',export:'Export'},themeLight:'Dark',themeDark:'Light',day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Current Day',optMonth:'Selected Month',cancel:'Cancel',do:'Export',hint:'Export will use:'}},
-  de:{dir:'ltr',brand:'Meine Stunden',nav:{day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export'},themeLight:'Dunkel',themeDark:'Hell',day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Heutiger Tag',optMonth:'Gewählter Monat',cancel:'Abbrechen',do:'Exportieren',hint:'Export erfolgt auf:'}}
+  ar:{dir:'rtl',brand:'ساعتي',flag:'🇸🇦',nav:{day:'اليوم',month:'الشهري',settings:'الإعدادات',export:'تصدير'},themeLight:'داكن',themeDark:'فاتح',day:{title:'الإدخال اليومي',hint:'أدخل البداية والنهاية والاستراحة. الحفظ تلقائي محليًا.',date:'تاريخ',start:'🟢 دخول',end:'🔴 خروج',break:'☕️ استراحة (دقيقة)',k1:'صافي اليوم',k2:'إضافي اليوم',k3:'أساس اليوم (س)',k4:'حالة الحفظ',saved:'تم الحفظ تلقائيًا ✅'},settings:{title:'الإعدادات',hint:'اضبط القيم الافتراضية.',daily:'أساس اليوم (ساعات)',brdef:'استراحة افتراضية (دقيقة)',apply:'حفظ'},month:{title:'ملخص شهري',pick:'اختر الشهر',m1:'مجموع الشهر',m2:'أيام مسجلة',m3:'معدل اليوم',close:'إغلاق',refresh:'تحديث',thead:['التاريخ','البداية','النهاية','استراحة','الصافي','إضافي']},export:{title:'تصدير',scope:'النطاق',format:'الصيغة',optDay:'اليوم الحالي',optMonth:'الشهر المختار',cancel:'إلغاء',do:'تصدير',png:'صورة (PNG)',json:'JSON'}},
+  en:{dir:'ltr',brand:'Saaati',flag:'🇬🇧',nav:{day:'Day',month:'Monthly',settings:'Settings',export:'Export'},themeLight:'Dark',themeDark:'Light',day:{title:'Daily Entry',hint:'Enter start, end and break. Autosaved locally.',date:'Date',start:'🟢 Clock In',end:'🔴 Clock Out',break:'☕️ Break (min)',k1:'Net Today',k2:'Overtime',k3:'Daily Base (h)',k4:'Save Status',saved:'Auto-saved ✅'},settings:{title:'Settings',hint:'Adjust defaults.',daily:'Daily Base (hours)',brdef:'Default Break (min)',apply:'Save'},month:{title:'Monthly Summary',pick:'Pick month',m1:'Month Total',m2:'Logged Days',m3:'Avg/Day',close:'Close',refresh:'Refresh',thead:['Date','Start','End','Break','Net','OT']},export:{title:'Export',scope:'Scope',format:'Format',optDay:'Current Day',optMonth:'Selected Month',cancel:'Cancel',do:'Export',png:'Image (PNG)',json:'JSON'}},
+  de:{dir:'ltr',brand:'Meine Stunden',flag:'🇩🇪',nav:{day:'Tag',month:'Monat',settings:'Einstellungen',export:'Export'},themeLight:'Dunkel',themeDark:'Hell',day:{title:'Tägliche Eingabe',hint:'Start, Ende und Pause. Lokal automatisch gespeichert.',date:'Datum',start:'🟢 Einchecken',end:'🔴 Auschecken',break:'☕️ Pause (Min.)',k1:'Netto heute',k2:'Überstunden',k3:'Tages-Soll (Std)',k4:'Speicherstatus',saved:'Automatisch gespeichert ✅'},settings:{title:'Einstellungen',hint:'Standardwerte anpassen.',daily:'Tages-Soll (Std.)',brdef:'Standardpause (Min.)',apply:'Speichern'},month:{title:'Monatsübersicht',pick:'Monat wählen',m1:'Monatssumme',m2:'Erfasste Tage',m3:'Schnitt/Tag',close:'Schließen',refresh:'Aktualisieren',thead:['Datum','Start','Ende','Pause','Netto','ÜSt']},export:{title:'Export',scope:'Bereich',format:'Format',optDay:'Heutiger Tag',optMonth:'Gewählter Monat',cancel:'Abbrechen',do:'Exportieren',png:'Bild (PNG)',json:'JSON'}}
 };
-const FLAGS={ar:'🇸🇦',en:'🇬🇧',de:'🇩🇪'};
 const LS_LANG='saaati_lang';
-
-function currentLangName(lang){ return lang==='ar'?'العربية':lang==='de'?'Deutsch':'English'; }
 
 function setLang(lang){
   const L=I18N[lang]||I18N.ar; document.documentElement.lang=lang; document.documentElement.dir=L.dir; document.body.dir=L.dir;
-  brandTxt.textContent=L.brand; navDay.textContent=L.nav.day; navMonth.textContent=L.nav.month; navSettings.textContent=L.nav.settings; navExport.textContent=L.nav.export; themeBtn.textContent = (document.body.classList.contains('dark')? L.themeDark : L.themeLight);
+  brandTxt.textContent=L.brand; navDay.textContent=L.nav.day; navMonth.textContent=L.nav.month; navSettings.textContent=L.nav.settings; navExport.textContent = `${L.flag} ${L.nav.export}`;
+  themeBtn.textContent = (document.body.classList.contains('dark')? L.themeDark : L.themeLight);
   titleDay.textContent=L.day.title; hintDay.textContent=L.day.hint; lblDate.textContent=L.day.date; lblStart.textContent=L.day.start; lblEnd.textContent=L.day.end; lblBreak.textContent=L.day.break; k1.textContent=L.day.k1; k2.textContent=L.day.k2; k3.textContent=L.day.k3; k4.textContent=L.day.k4;
   titleSettings.textContent=L.settings.title; hintSettings.textContent=L.settings.hint; lblDaily.textContent=L.settings.daily; lblBreakDef.textContent=L.settings.brdef; applySettings.textContent=L.settings.apply;
   titleMonth.textContent=L.month.title; lblPickMonth.textContent=L.month.pick; mk1.textContent=L.month.m1; mk2.textContent=L.month.m2; mk3.textContent=L.month.m3; refreshMonth.textContent=L.month.refresh; closeMonth.textContent=L.month.close;
-  titleExport.textContent=L.export.title; lblScope.textContent=L.export.scope; lblFormat.textContent=L.export.format; expScope.options[0].text=L.export.optDay; expScope.options[1].text=L.export.optMonth; closeExport.textContent=L.export.cancel; doExport.textContent=L.export.do;
-  langFlag.textContent = FLAGS[lang]||'🌐';
-  expLangHint.textContent = `${L.export.hint} ${langFlag.textContent} ${currentLangName(lang)}`;
+  titleExport.textContent=L.export.title; lblScope.textContent=L.export.scope; lblFormat.textContent=L.export.format; expScope.options[0].text=L.export.optDay; expScope.options[1].text=L.export.optMonth; 
+  expFormat.options[0].text=L.export.png; expFormat.options[1].text=L.export.json;
+  closeExport.textContent=L.export.cancel; doExport.textContent=L.export.do;
   localStorage.setItem(LS_LANG, lang);
   if(monthArea.dataset.built==='1'){ buildMonthTableHead(lang); }
 }
@@ -159,8 +154,6 @@ const navMonth=document.getElementById('navMonth');
 const navSettings=document.getElementById('navSettings');
 const navExport=document.getElementById('navExport');
 const langSel=document.getElementById('langSel');
-const langFlag=document.getElementById('langFlag');
-const expLangHint=document.getElementById('expLangHint');
 const brandTxt=document.getElementById('brandTxt');
 
 const dayCard=document.getElementById('dayCard');
@@ -219,26 +212,47 @@ function openMonth(){ monthModal.classList.add('open'); monthModal.setAttribute(
 function closeMonthFn(){ monthModal.classList.remove('open'); monthModal.setAttribute('aria-hidden','true'); }
 function refreshMonthSummary(){ const month=monthPick.value || dayDate.value.slice(0,7); const [y,mo]=month.split('-').map(Number); const first=new Date(y,mo-1,1), last=new Date(y,mo,0); const baseDay=Math.round(parseFloat(stDaily.value||8)*60); const rows=[]; let total=0, daysCount=0; for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){ const key='day-'+d.toISOString().slice(0,10); const raw=localStorage.getItem(key); if(!raw) continue; try{ const p=JSON.parse(raw); if(p.start && p.end){ let sm=h2m(p.start), em=h2m(p.end); if(em<sm) em+=1440; const net=Math.max(0,(em-sm)-parseInt(p.break||0,10)); const ot=Math.max(0, net-baseDay); rows.push([key.slice(4), p.start, p.end, p.break||0, m2h(net), m2h(ot)]); total+=net; daysCount++; } }catch{} } rows.sort((a,b)=> a[0]<b[0]?-1:1); const lang=langSel.value||'ar'; const L=I18N[lang]; let html=`<table class="table"><thead></thead><tbody>`; rows.forEach(r=> html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>` ); html+='</tbody></table>'; monthArea.innerHTML=html; monthArea.dataset.built='1'; buildMonthTableHead(lang); mTotal.textContent=m2h(total); mDays.textContent=String(daysCount); mAvg.textContent=daysCount? m2h(Math.round(total/daysCount)):'0:00'; }
 
-// Export helpers (PNG via html2canvas from the bundle)
+// Export helpers (PNG/JSON)
 async function nodeToPNGAndDownload(node, filename){
-  const h2c = window.html2canvas || (window.html2pdf && window.html2pdf().get && window.html2pdf().get('html2canvas'));
-  if(!h2c){ alert('Exporter not loaded. Please reload.'); return; }
-  document.body.appendChild(node);
-  const canvas = await html2canvas(node, {scale:2, useCORS:true, backgroundColor:'#ffffff'});
-  const url = canvas.toDataURL('image/png');
-  const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
-  document.body.removeChild(node);
+  if(typeof html2canvas==='undefined'){ alert('Image export is unavailable. Please check your internet connection.'); return; }
+  const canvas = await html2canvas(node,{scale:2,backgroundColor:'#ffffff'});
+  const dataURL = canvas.toDataURL('image/png');
+  const a=document.createElement('a'); a.href=dataURL; a.download=filename.endsWith('.png')? filename : `${filename}.png`; a.click();
 }
 
-function exportDayPNG(){ const lang=langSel.value||'ar'; const L=I18N[lang]; const p={date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)}; const node=document.createElement('div'); node.dir=L.dir; node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; width:794px; background:#fff;'; node.innerHTML=`<h2 style="margin:0 0 8px">${L.day.title} — ${p.date}</h2><div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${p.start||'-'}</strong> — ${L.day.end.replace('🔴 ','')}: <strong>${p.end||'-'}</strong> — ${L.day.break.replace('☕️ ','')}: <strong>${p.break||0}</strong></div><div style="margin:6px 0">${L.day.k1}: <strong>${dNet.textContent}</strong> — ${L.day.k2}: <strong>${dOT.textContent}</strong> — ${L.settings.daily}: <strong>${stDaily.value}</strong></div>`; nodeToPNGAndDownload(node, `day-${p.date}.png`); }
+function exportDayPNG(){
+  const lang=langSel.value||'ar'; const L=I18N[lang];
+  const node=document.createElement('div'); node.dir=L.dir; node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;';
+  node.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h2 style="margin:0">${L.day.title}</h2><div>${new Date().toLocaleString()}</div></div>`+
+                 `<div style="margin:6px 0">${L.day.date}: <strong>${dayDate.value}</strong></div>`+
+                 `<div style="margin:6px 0">${L.day.start.replace('🟢 ','')}: <strong>${dayStart.value||'-'}</strong> — ${L.day.end.replace('🔴 ','')}: <strong>${dayEnd.value||'-'}</strong> — ${L.day.break.replace('☕️ ','')}: <strong>${dayBreak.value||0}</strong></div>`+
+                 `<div style="margin:6px 0">${L.day.k1}: <strong>${dNet.textContent}</strong> — ${L.day.k2}: <strong>${dOT.textContent}</strong> — ${L.settings.daily}: <strong>${stDaily.value}</strong></div>`;
+  document.body.appendChild(node);
+  nodeToPNGAndDownload(node, `day-${dayDate.value}.png`).then(()=> node.remove());
+}
 
-function exportMonthPNG(){ refreshMonthSummary(); const lang=langSel.value||'ar'; const L=I18N[lang]; const month=monthPick.value || dayDate.value.slice(0,7); const node=document.createElement('div'); node.dir=L.dir; node.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; width:900px; background:#fff;'; node.innerHTML=`<h2 style=\"margin:0 0 8px\">${L.month.title} — ${month}</h2>` + monthArea.innerHTML + `<div style=\"margin-top:8px\">${L.month.m1}: <strong>${mTotal.textContent}</strong> — ${L.month.m2}: <strong>${mDays.textContent}</strong> — ${L.month.m3}: <strong>${mAvg.textContent}</strong></div>`; nodeToPNGAndDownload(node, `month-${month}.png`); }
+function exportMonthPNG(){
+  refreshMonthSummary();
+  const lang=langSel.value||'ar'; const L=I18N[lang]; const month=monthPick.value || dayDate.value.slice(0,7);
+  const wrapper=document.createElement('div'); wrapper.dir=L.dir; wrapper.style.cssText='font-family: system-ui, "Noto Naskh Arabic", Tahoma; padding:16px; color:#0f172a; background:#ffffff;';
+  const header=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h2 style="margin:0">${L.month.title}</h2><div>${new Date().toLocaleString()}</div></div><div style="margin-bottom:6px">${month}</div>`;
+  wrapper.innerHTML= header + monthArea.innerHTML + `<div style="margin-top:8px">${L.month.m1}: <strong>${mTotal.textContent}</strong> — ${L.month.m2}: <strong>${mDays.textContent}</strong> — ${L.month.m3}: <strong>${mAvg.textContent}</strong></div>`;
+  document.body.appendChild(wrapper);
+  nodeToPNGAndDownload(wrapper, `month-${month}.png`).then(()=> wrapper.remove());
+}
 
-function openExport(){ exportModal.classList.add('open'); exportModal.setAttribute('aria-hidden','false'); const lang=langSel.value||'ar'; const L=I18N[lang]; expLangHint.textContent = `${L.export.hint} ${FLAGS[lang]} ${currentLangName(lang)}`; }
-function closeExportFn(){ exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); }
+function exportDayJSON(){
+  const lang=langSel.value||'ar';
+  const data={ meta:{scope:'day',lang, date:dayDate.value, exportedAt:new Date().toISOString()}, payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)} };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url);
+}
 
-function exportDayJSON(){ const lang=langSel.value||'ar'; const data={ meta:{scope:'day',lang, date:dayDate.value, exportedAt:new Date().toISOString()}, payload:{date:dayDate.value,start:dayStart.value,end:dayEnd.value,break:parseInt(dayBreak.value||0,10)} }; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`day-${dayDate.value}.json`; a.click(); URL.revokeObjectURL(url); }
-function exportMonthJSON(){ refreshMonthSummary(); const month=monthPick.value || dayDate.value.slice(0,7); const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim())); const data={ meta:{scope:'month',month, exportedAt:new Date().toISOString()}, rows, totals:{ total:mTotal.textContent, days:mDays.textContent, avg:mAvg.textContent } }; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url); }
+function exportMonthJSON(){
+  refreshMonthSummary(); const month=monthPick.value || dayDate.value.slice(0,7);
+  const rows=[...monthArea.querySelectorAll('tbody tr')].map(tr=>[...tr.children].map(td=>td.textContent.trim()));
+  const data={ meta:{scope:'month',month, exportedAt:new Date().toISOString()}, rows, totals:{ total:mTotal.textContent, days:mDays.textContent, avg:mAvg.textContent } };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`month-${month}.json`; a.click(); URL.revokeObjectURL(url);
+}
 
 // Navigation
 function showCard(card){ [dayCard, settingsCard].forEach(el=> el.style.display='none'); card.style.display='block'; }
